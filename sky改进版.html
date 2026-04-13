@@ -1,0 +1,1821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>无人深空：星海编年史与PCG创世</title>
+  
+  <!-- 引入 Tailwind CSS 进行样式渲染 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- 引入 React 和 ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- 引入 Babel 用于在浏览器中解析 JSX 语法 -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    /* 基础动画保持不变 */
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .animate-spin-slow {
+      animation: spin-slow 4s linear infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-15px) rotate(1.5deg); }
+    }
+    .animate-float {
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float-delayed {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(12px) rotate(-1deg); }
+    }
+    .animate-float-delayed {
+      animation: float-delayed 8s ease-in-out infinite;
+    }
+
+    /* 电影级文字快闪特效 */
+    @keyframes cinematic-zoom-long {
+      0% { transform: scale(0.95); opacity: 0; filter: blur(10px); }
+      10% { opacity: 1; filter: blur(0px); }
+      90% { opacity: 1; filter: blur(0px); }
+      100% { transform: scale(1.05); opacity: 0; filter: blur(10px); }
+    }
+    .animate-cinematic-long {
+      animation: cinematic-zoom-long 4s ease-in-out forwards;
+    }
+
+    @keyframes cinematic-zoom {
+      0% { transform: scale(0.95); opacity: 0; filter: blur(10px); }
+      15% { opacity: 1; filter: blur(0px); }
+      85% { opacity: 1; filter: blur(0px); }
+      100% { transform: scale(1.05); opacity: 0; filter: blur(10px); }
+    }
+    .animate-cinematic {
+      animation: cinematic-zoom 4s ease-in-out forwards;
+    }
+    
+    @keyframes text-reveal {
+      0% { opacity: 0; transform: translateY(20px); filter: blur(5px); }
+      100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+    }
+    .animate-reveal {
+      animation: text-reveal 1s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeIn {
+      animation: fadeIn 1.5s ease-out forwards;
+    }
+
+    @keyframes code-scroll {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-50%); }
+    }
+    .animate-code-scroll {
+      animation: code-scroll 1.5s linear infinite;
+    }
+
+    @keyframes warp-lines {
+      0% { transform: translateY(-100%); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translateY(200%); opacity: 0; }
+    }
+    .animate-warp-lines {
+      animation: warp-lines 1.5s linear infinite;
+    }
+    @keyframes accumulate-bar {
+      0% { width: 5%; background-color: #ef4444; box-shadow: 0 0 10px #ef4444; }
+      50% { width: 50%; background-color: #eab308; box-shadow: 0 0 15px #eab308; }
+      100% { width: 100%; background-color: #a855f7; box-shadow: 0 0 20px #a855f7; }
+    }
+    .animate-accumulate-bar {
+      animation: accumulate-bar 3s ease-in-out infinite alternate;
+    }
+    
+    @keyframes ship-approach {
+      0% { transform: translate(-200px, 100px) scale(0.5); opacity: 0; }
+      20% { opacity: 1; }
+      50% { transform: translate(-40px, 20px) scale(1); opacity: 1; }
+      80% { transform: translate(-40px, 20px) scale(1); opacity: 1; }
+      100% { transform: translate(200px, -100px) scale(0.5); opacity: 0; }
+    }
+    .animate-ship-approach {
+      animation: ship-approach 8s ease-in-out forwards;
+    }
+    @keyframes text-glow-pulse {
+      0%, 100% { text-shadow: 0 0 10px rgba(216,180,254,0.4); }
+      50% { text-shadow: 0 0 30px rgba(216,180,254,1), 0 0 40px rgba(168,85,247,0.8); }
+    }
+    .animate-text-glow {
+      animation: text-glow-pulse 4s ease-in-out infinite;
+    }
+
+    /* 结尾深空星云与流星特效 */
+    @keyframes nebula-drift-1 {
+      0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+      33% { transform: translate(3vw, -4vh) scale(1.1) rotate(5deg); }
+      66% { transform: translate(-2vw, 3vh) scale(0.95) rotate(-3deg); }
+      100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+    }
+    @keyframes nebula-drift-2 {
+      0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+      33% { transform: translate(-4vw, 5vh) scale(1.05) rotate(-5deg); }
+      66% { transform: translate(3vw, -3vh) scale(0.9) rotate(2deg); }
+      100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+    }
+    @keyframes shooting-star {
+      0% { transform: rotate(135deg) translateX(0); opacity: 1; width: 0; }
+      5% { opacity: 1; width: 180px; }
+      15% { opacity: 0; transform: rotate(135deg) translateX(1200px); width: 0; }
+      100% { opacity: 0; }
+    }
+    .shooting-star-wrapper {
+      position: absolute;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(168,85,247,0.6) 50%, rgba(255,255,255,1) 100%);
+      animation: shooting-star 6s linear infinite;
+      box-shadow: 0 0 10px rgba(168,85,247,0.3);
+    }
+    .shooting-star-wrapper::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 0 12px 3px rgba(255,255,255,0.9), 0 0 20px 4px rgba(168,85,247,0.6);
+    }
+
+    /* 多重宇宙回声渐现动画 */
+    @keyframes echo-appear {
+      0% { opacity: 0; filter: blur(8px); transform: translateY(20px) scale(0.9); }
+      100% { opacity: 0.85; filter: blur(0px); transform: translateY(0) scale(1); }
+    }
+    .animate-echo {
+      animation: echo-appear 2s ease-out forwards;
+      opacity: 0; /* 初始隐藏 */
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased overflow-x-hidden">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // --- 内置 SVG 图标组件 ---
+    const IconWrapper = ({ children, className = "", style = {} }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} style={style}>
+        {children}
+      </svg>
+    );
+
+    // 基础图标
+    const Rocket = (props) => <IconWrapper {...props}><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></IconWrapper>;
+    const AlertTriangle = (props) => <IconWrapper {...props}><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></IconWrapper>;
+    const Wrench = (props) => <IconWrapper {...props}><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></IconWrapper>;
+    const Globe = (props) => <IconWrapper {...props}><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></IconWrapper>;
+    const Users = (props) => <IconWrapper {...props}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></IconWrapper>;
+    const Headset = (props) => <IconWrapper {...props}><path d="M3 11h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5Zm0 0a9 9 0 1 1 18 0m0 0v5a2 2 0 0 1-2 2h-1a2 2 0 0 1 2-2h3Z"/><path d="M21 16v2a4 4 0 0 1-4 4h-5"/></IconWrapper>;
+    const Mountain = (props) => <IconWrapper {...props}><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></IconWrapper>;
+    const Cpu = (props) => <IconWrapper {...props}><rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></IconWrapper>;
+    const CloudLightning = (props) => <IconWrapper {...props}><path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973"/><path d="m13 12-3 5h4l-3 5"/></IconWrapper>;
+    const ChevronRight = (props) => <IconWrapper {...props}><path d="m9 18 6-6-6-6"/></IconWrapper>;
+    const ChevronLeft = (props) => <IconWrapper {...props}><path d="m15 18-6-6 6-6"/></IconWrapper>;
+    const Crosshair = (props) => <IconWrapper {...props}><circle cx="12" cy="12" r="10"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M2 12h2"/><path d="M20 12h2"/></IconWrapper>;
+    const Activity = (props) => <IconWrapper {...props}><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0L8.76 10.54a2 2 0 0 1-1.93 1.46H2"/></IconWrapper>;
+    const Database = (props) => <IconWrapper {...props}><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></IconWrapper>;
+    const Pickaxe = (props) => <IconWrapper {...props}><path d="M14.531 12.469 6.619 20.38a1 1 0 1 1-3-3l7.912-7.912"/><path d="M15.686 4.314A12.5 12.5 0 0 0 5.461 2.958 1 1 0 0 0 5.58 4.71a22 22 0 0 1 6.318 3.393"/><path d="M17.7 3.7a1 1 0 0 0-1.4 0l-4.6 4.6a1 1 0 0 0 0 1.4l2.6 2.6a1 1 0 0 0 1.4 0l4.6-4.6a1 1 0 0 0 0-1.4z"/><path d="M19.686 8.314a12.501 12.501 0 0 1 1.356 10.225 1 1 0 0 1-1.752-.119 22 22 0 0 0-3.393-6.319"/></IconWrapper>;
+    const Search = (props) => <IconWrapper {...props}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></IconWrapper>;
+    const Swords = (props) => <IconWrapper {...props}><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" x2="19" y1="19" y2="13"/><line x1="16" x2="20" y1="16" y2="20"/><line x1="19" x2="21" y1="21" y2="19"/><polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"/><line x1="5" x2="9" y1="14" y2="18"/><line x1="7" x2="4" y1="17" y2="20"/><line x1="3" x2="5" y1="19" y2="21"/></IconWrapper>;
+    const Coins = (props) => <IconWrapper {...props}><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></IconWrapper>;
+    const Terminal = (props) => <IconWrapper {...props}><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></IconWrapper>;
+    const Binary = (props) => <IconWrapper {...props}><rect x="14" y="14" width="4" height="6" rx="2"/><rect x="6" y="4" width="4" height="6" rx="2"/><path d="M6 20h4"/><path d="M14 10h4"/><path d="M6 14h2v6"/><path d="M14 4h2v6"/></IconWrapper>;
+    const Hash = (props) => <IconWrapper {...props}><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></IconWrapper>;
+    const Key = (props) => <IconWrapper {...props}><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></IconWrapper>;
+    const Compass = (props) => <IconWrapper {...props}><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></IconWrapper>;
+    const Settings = (props) => <IconWrapper {...props}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1-1-1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></IconWrapper>;
+    const InfinityIcon = (props) => <IconWrapper {...props}><path d="M12 12c-2-2.67-4-4-6-4a4 4 0 1 0 0 8c2 0 4-1.33 6-4Zm0 0c2 2.67 4 4 6 4a4 4 0 0 0 0-8c-2 0-4 1.33-6 4Z"/></IconWrapper>;
+    const Eye = (props) => <IconWrapper {...props}><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></IconWrapper>;
+    const RadioSignal = (props) => <IconWrapper {...props}><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/></IconWrapper>;
+    const Sparkles = (props) => <IconWrapper {...props}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></IconWrapper>;
+    const User = (props) => <IconWrapper {...props}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></IconWrapper>;
+    const RefreshCw = (props) => <IconWrapper {...props}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></IconWrapper>;
+    const MessageSquare = (props) => <IconWrapper {...props}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></IconWrapper>;
+
+    // --- 游戏历程数据 ---
+    const milestones = [
+      { id: 1, date: '2016.08', name: '发售初版 / Launch', desc: '充满争议的起点。宇宙浩瀚却略显空洞，遭遇史诗级的口碑滑铁卢。但开发团队选择了沉默并开始埋头苦干。', icon: AlertTriangle, color: 'text-red-500', bgColor: 'bg-red-500', borderColor: 'border-red-500', status: 'SYSTEM WARNING' },
+      { id: 2, date: '2016.11', name: '基础 / Foundation', desc: '救赎之路开启。游戏引入了基础的基地建设系统、可购买的大型货船，以及更具挑战性的生存和永久死亡模式。', icon: Wrench, color: 'text-orange-400', bgColor: 'bg-orange-400', borderColor: 'border-orange-400', status: 'REBUILDING' },
+      { id: 3, date: '2017.08', name: '崛起 / Atlas Rises', desc: '补全了世界观，引入长达30小时的完整故事主线。加入了星际传送门、坠毁货船，并首次实现了玩家间的“光球”可见联机。', icon: Globe, color: 'text-yellow-400', bgColor: 'bg-yellow-400', borderColor: 'border-yellow-400', status: 'EXPANDING' },
+      { id: 4, date: '2018.07', name: 'NEXT', desc: '真正的分水岭！带来全面的多人联机模式、第三人称视角、画质全面升级以及舰队指挥系统。口碑彻底逆转，重获新生。', icon: Users, color: 'text-green-400', bgColor: 'bg-green-400', borderColor: 'border-green-400', status: 'OPTIMAL' },
+      { id: 5, date: '2019.08', name: '超越 / Beyond', desc: '引入完整的VR虚拟现实支持，将沉浸感提升到新高度。大幅扩展了多人社交枢纽“太空异象”，最高支持32人同屏。', icon: Headset, color: 'text-pink-400', bgColor: 'bg-pink-400', borderColor: 'border-pink-400', status: 'IMMERSIVE' },
+      { id: 6, date: '2020.09', name: '起源 / Origins', desc: '宇宙多样性大爆发。加入了数百万个新星球、高耸的山脉、活火山、巨型沙虫以及龙卷风等极端动态天气系统。', icon: Mountain, color: 'text-teal-400', bgColor: 'bg-teal-400', borderColor: 'border-teal-400', status: 'DIVERSE' },
+      { id: 7, date: '2023.08', name: '回声 / Echoes', desc: '全新的隐藏机器种族“自噬体”登场。引入了史诗级的太空无畏舰战役、定制化机械法杖武器以及披风等外观系统。', icon: Cpu, color: 'text-cyan-400', bgColor: 'bg-cyan-400', borderColor: 'border-cyan-400', status: 'EVOLVED' },
+      { id: 8, date: '2024.07', name: '世界 Pt.1 / Worlds', desc: '游戏底层引擎的革命性重制。带来极其逼真的动态水体和海浪、体积云、全新的大气系统以及丰富的全新动植物群落。', icon: CloudLightning, color: 'text-indigo-400', bgColor: 'bg-indigo-400', borderColor: 'border-indigo-400', status: 'REVOLUTIONARY' }
+    ];
+
+    // --- 动态星空背景组件 ---
+    const Starfield = ({ density = 50, dark = false, transparentBackground = false }) => {
+      const [stars] = useState(() => [...Array(density)].map(() => ({
+        top: `${Math.random() * 100}%`,
+        left: `${Math.random() * 100}%`,
+        width: `${Math.random() * 3 + 1}px`,
+        height: `${Math.random() * 3 + 1}px`,
+        opacity: Math.random() * 0.8 + 0.2,
+        animationDuration: `${Math.random() * 3 + 2}s`
+      })));
+
+      return (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+          {!transparentBackground && (
+            <div className={`absolute inset-0 ${dark ? 'bg-black/90' : 'bg-slate-950/50 mix-blend-multiply'}`}></div>
+          )}
+          {stars.map((style, i) => (
+            <div key={i} className={`absolute rounded-full animate-pulse ${dark ? 'bg-cyan-100/50' : 'bg-white'}`} style={style} />
+          ))}
+        </div>
+      );
+    };
+
+    // --- 专属深空星云与流星特效背景 ---
+    const NebulaBackground = () => {
+      const [shootingStars] = useState(() => Array.from({ length: 8 }).map(() => ({
+        top: `${Math.random() * 30}%`, 
+        left: `${Math.random() * 60 + 40}%`, 
+        delay: `${Math.random() * 10}s`,
+        duration: `${Math.random() * 2 + 4}s`
+      })));
+
+      return (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+          <div className="absolute inset-0 bg-[#02040a]"></div>
+          <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full opacity-50 filter blur-[100px] mix-blend-screen" 
+               style={{ background: 'radial-gradient(circle, rgba(147,51,234,0.35) 0%, rgba(0,0,0,0) 70%)', animation: 'nebula-drift-1 25s infinite ease-in-out' }}></div>
+          <div className="absolute bottom-[-20%] right-[-10%] w-[80%] h-[80%] rounded-full opacity-40 filter blur-[120px] mix-blend-screen" 
+               style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.25) 0%, rgba(59,130,246,0.2) 40%, rgba(0,0,0,0) 70%)', animation: 'nebula-drift-2 30s infinite ease-in-out reverse' }}></div>
+          <div className="absolute top-[20%] left-[30%] w-[50%] h-[50%] rounded-full opacity-30 filter blur-[90px] mix-blend-screen" 
+               style={{ background: 'radial-gradient(circle, rgba(76,29,149,0.4) 0%, rgba(0,0,0,0) 70%)', animation: 'nebula-drift-1 35s infinite ease-in-out 5s' }}></div>
+
+          <Starfield density={100} dark={true} transparentBackground={true} />
+
+          {shootingStars.map((star, i) => (
+            <div key={i} className="shooting-star-wrapper" style={{
+              top: star.top, left: star.left, animationDelay: star.delay, animationDuration: star.duration
+            }}></div>
+          ))}
+        </div>
+      );
+    };
+
+    // --- 全局曲速跃迁过场组件 (Warp Drive) ---
+    const WarpOverlay = ({ warpState }) => {
+      const canvasRef = useRef(null);
+
+      useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+        let stars = [];
+        const numStars = 600;
+        let speed = 0;
+        let animationId;
+
+        for (let i = 0; i < numStars; i++) {
+          stars.push({
+            x: (Math.random() - 0.5) * width * 2,
+            y: (Math.random() - 0.5) * height * 2,
+            z: Math.random() * width,
+            pz: Math.random() * width,
+            color: Math.random() > 0.6 ? '#ffffff' : (Math.random() > 0.4 ? '#22d3ee' : '#c084fc')
+          });
+        }
+
+        const render = () => {
+          ctx.fillStyle = `rgba(2, 4, 10, ${warpState === 'warping_out' ? 0.3 : 0.5})`;
+          ctx.fillRect(0, 0, width, height);
+
+          const targetSpeed = warpState === 'warping_in' ? 120 : (warpState === 'warping_out' ? 2 : 0.5);
+          speed += (targetSpeed - speed) * 0.08;
+
+          ctx.translate(width / 2, height / 2);
+
+          stars.forEach(star => {
+            star.pz = star.z;
+            star.z -= speed;
+
+            if (star.z < 1) {
+              star.z = width;
+              star.pz = width;
+              star.x = (Math.random() - 0.5) * width * 2;
+              star.y = (Math.random() - 0.5) * height * 2;
+            }
+
+            const sx = star.x / star.z * (width / 2);
+            const sy = star.y / star.z * (height / 2);
+            const px = star.x / star.pz * (width / 2);
+            const py = star.y / star.pz * (height / 2);
+
+            const opacity = Math.min(1, (width - star.z) / (width * 0.5));
+
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.lineTo(sx, sy);
+            ctx.lineWidth = Math.max(0.5, (1 - star.z / width) * 4);
+            ctx.strokeStyle = star.color;
+            ctx.globalAlpha = opacity;
+            
+            if (speed > 50) {
+              ctx.shadowBlur = 10;
+              ctx.shadowColor = star.color;
+            } else {
+              ctx.shadowBlur = 0;
+            }
+            
+            ctx.stroke();
+          });
+
+          ctx.translate(-width / 2, -height / 2);
+          ctx.globalAlpha = 1;
+
+          if (warpState === 'warping_in') {
+             const gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width/3);
+             gradient.addColorStop(0, `rgba(255,255,255, ${speed/150})`);
+             gradient.addColorStop(0.2, `rgba(34,211,238, ${speed/200})`);
+             gradient.addColorStop(1, 'transparent');
+             ctx.fillStyle = gradient;
+             ctx.globalCompositeOperation = 'screen';
+             ctx.fillRect(0, 0, width, height);
+             ctx.globalCompositeOperation = 'source-over';
+          }
+
+          animationId = requestAnimationFrame(render);
+        };
+
+        const handleResize = () => {
+          width = canvas.width = window.innerWidth;
+          height = canvas.height = window.innerHeight;
+        };
+        window.addEventListener('resize', handleResize);
+        render();
+
+        return () => {
+          window.removeEventListener('resize', handleResize);
+          cancelAnimationFrame(animationId);
+        };
+      }, [warpState]);
+
+      return (
+        <div className={`fixed inset-0 z-[100] pointer-events-none transition-opacity duration-700 ease-in-out ${warpState !== 'idle' ? 'opacity-100' : 'opacity-0'}`}>
+          <canvas ref={canvasRef} className="w-full h-full bg-[#02040a]" />
+        </div>
+      );
+    };
+
+    // --- 核心：代码转星球的 Canvas 粒子系统 (Intro使用) ---
+    const CanvasUniverse = ({ step, warpTarget }) => {
+      const canvasRef = useRef(null);
+      const stepRef = useRef(step);
+      const warpTargetRef = useRef(warpTarget);
+      
+      useEffect(() => { stepRef.current = step; }, [step]);
+      useEffect(() => { warpTargetRef.current = warpTarget; }, [warpTarget]);
+
+      useEffect(() => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d', { alpha: false });
+        let animationFrameId;
+        let particles = [];
+        const chars = '01#@$%&*!?ABCDEFGHIJKLMNOPQRSTUVWXYZΣ∫π∞∆∇μλ';
+        const planetColors = ['#22d3ee', '#d946ef', '#6366f1', '#fef08a', '#ffffff', '#38bdf8', '#fb7185'];
+
+        const initParticles = () => {
+          particles = [];
+          const spacing = 22; 
+          const cols = Math.ceil(window.innerWidth / spacing);
+          const rows = Math.ceil(window.innerHeight / spacing);
+          const total = cols * rows;
+
+          for (let i = 0; i < total; i++) {
+            const col = i % cols;
+            const row = Math.floor(i / cols);
+            const isPlanet = Math.random() < 0.08; 
+            const targetSize = isPlanet ? Math.random() * 3 + 2 : Math.random() * 1.5 + 0.2;
+            
+            particles.push({
+              x: col * spacing + spacing / 2,
+              y: row * spacing + spacing / 2,
+              planetX: Math.random() * window.innerWidth,
+              planetY: Math.random() * window.innerHeight,
+              size: 0,
+              targetSize: targetSize,
+              char: chars[Math.floor(Math.random() * chars.length)],
+              color: isPlanet ? planetColors[Math.floor(Math.random() * planetColors.length)] : '#cbd5e1',
+              delay: Math.random() * 80, 
+              state: 'code' 
+            });
+          }
+        };
+
+        const resize = () => {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+          if (stepRef.current === 0) initParticles();
+        };
+        window.addEventListener('resize', resize);
+        resize();
+
+        let frame = 0;
+        let prevStep = stepRef.current;
+
+        const render = () => {
+          frame++;
+          const currentStep = stepRef.current;
+
+          if (currentStep !== prevStep) {
+            if (currentStep > 0 && prevStep > 0 && currentStep < 5) {
+              particles.forEach(p => {
+                p.planetX = Math.random() * canvas.width;
+                p.planetY = Math.random() * canvas.height;
+                if (currentStep === 2 && Math.random() < 0.3) p.color = '#ef4444'; 
+                else if (currentStep === 3 && Math.random() < 0.4) p.color = '#22d3ee';
+                else if (currentStep === 4 && Math.random() < 0.1) p.color = '#ffffff';
+                p.state = 'morphing';
+                p.delay = 0;
+              });
+            } else if (currentStep === 5 && warpTargetRef.current) {
+               particles.forEach(p => {
+                 p.state = 'warping';
+                 p.r = Math.sqrt((p.x - warpTargetRef.current.x)**2 + (p.y - warpTargetRef.current.y)**2);
+                 p.angle = Math.atan2(p.y - warpTargetRef.current.y, p.x - warpTargetRef.current.x);
+                 p.size = Math.min(p.size || 1.5, 2.5);
+               });
+            }
+            prevStep = currentStep;
+          }
+
+          if (currentStep === 0) {
+            ctx.fillStyle = 'rgba(5, 10, 15, 1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+          } else if (currentStep === 5) {
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.25)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+          } else {
+            const gradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, canvas.width);
+            gradient.addColorStop(0, 'rgba(15, 23, 42, 0.3)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0.3)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+          }
+
+          particles.forEach(p => {
+            if (currentStep === 0) {
+              if (frame % 8 === 0 && Math.random() < 0.05) p.char = chars[Math.floor(Math.random() * chars.length)];
+              const glitchOffset = Math.random() < 0.01 ? (Math.random() - 0.5) * 8 : 0;
+              ctx.fillStyle = Math.random() < 0.05 ? '#a7f3d0' : '#06b6d4'; 
+              ctx.font = '14px monospace';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              ctx.fillText(p.char, p.x + glitchOffset, p.y);
+            } else {
+              if (p.state === 'code') {
+                if (p.delay > 0) {
+                  p.delay--;
+                  ctx.fillStyle = '#06b6d4';
+                  ctx.font = '14px monospace';
+                  ctx.fillText(p.char, p.x, p.y);
+                  return;
+                } else p.state = 'morphing';
+              }
+
+              if (p.state === 'morphing' || p.state === 'planet') {
+                const dx = p.planetX - p.x;
+                const dy = p.planetY - p.y;
+                p.x += dx * 0.04;
+                p.y += dy * 0.04;
+                p.size += (p.targetSize - p.size) * 0.05;
+
+                if (Math.abs(dx) < 1 && Math.abs(dy) < 1) {
+                  p.state = 'planet';
+                  p.planetX += (Math.random() - 0.5) * 0.8;
+                  p.planetY += (Math.random() - 0.5) * 0.8;
+                }
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                if (p.targetSize > 2) {
+                  ctx.shadowBlur = p.size * 3;
+                  ctx.shadowColor = p.color;
+                }
+                ctx.fill();
+                ctx.shadowBlur = 0; 
+              } else if (p.state === 'warping' && warpTargetRef.current) {
+                const tx = warpTargetRef.current.x;
+                const ty = warpTargetRef.current.y;
+                const speed = 0.02 + 15 / (p.r + 50); 
+                p.angle += speed;
+                p.r *= 0.94;
+                p.x = tx + p.r * Math.cos(p.angle);
+                p.y = ty + p.r * Math.sin(p.angle);
+                
+                if (p.r > 2) {
+                  ctx.beginPath();
+                  ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                  const alpha = Math.min(0.6, p.r / 100);
+                  ctx.fillStyle = `rgba(6, 182, 212, ${alpha})`; 
+                  ctx.fill();
+                }
+              }
+            }
+          });
+
+          animationFrameId = requestAnimationFrame(render);
+        };
+        render();
+
+        return () => {
+          window.removeEventListener('resize', resize);
+          cancelAnimationFrame(animationFrameId);
+        };
+      }, []);
+
+      return <canvas ref={canvasRef} className="absolute inset-0 z-0 pointer-events-none" />;
+    };
+
+    // --- 开场剧情组件 ---
+    const IntroScreen = ({ onComplete }) => {
+      const [step, setStep] = useState(0); 
+      const [warpTarget, setWarpTarget] = useState(null);
+
+      useEffect(() => {
+        if (step === 0) { const timeout = setTimeout(() => setStep(1), 4000); return () => clearTimeout(timeout); }
+        else if (step === 1) { const timeout = setTimeout(() => setStep(2), 3000); return () => clearTimeout(timeout); }
+        else if (step === 2) { const timeout = setTimeout(() => setStep(3), 3000); return () => clearTimeout(timeout); }
+        else if (step === 3) { const timeout = setTimeout(() => setStep(4), 3000); return () => clearTimeout(timeout); }
+      }, [step]);
+
+      const handleStart = (e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        setWarpTarget({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+        setStep(5);
+        setTimeout(() => onComplete(), 1000); 
+      };
+
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-black">
+          <CanvasUniverse step={step} warpTarget={warpTarget} />
+          {step === 0 && (
+            <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 animate-cinematic-long w-full pointer-events-none">
+              <div className="flex items-center gap-4 mb-8 opacity-80">
+                <div className="w-16 md:w-32 h-[1px] bg-gradient-to-r from-transparent to-cyan-400"></div>
+                <span className="text-cyan-300 font-mono tracking-[0.3em] text-xs md:text-sm uppercase">Theme Presentation</span>
+                <div className="w-16 md:w-32 h-[1px] bg-gradient-to-l from-transparent to-cyan-400"></div>
+              </div>
+              <h1 className="text-5xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-cyan-100 to-cyan-500 drop-shadow-[0_0_40px_rgba(34,211,238,0.5)] tracking-widest mb-10 py-2">
+                公式、躯壳与灵魂
+              </h1>
+              <div className="border-l-4 border-cyan-400 pl-6 md:pl-8 text-left max-w-3xl">
+                <h2 className="text-xl md:text-3xl text-slate-200 font-light tracking-[0.2em] md:tracking-[0.4em] leading-relaxed">
+                  从《无人深空》看 AI 游戏的<br/>
+                  <span className="text-cyan-300 font-medium drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]">未来与羁绊</span>
+                </h2>
+              </div>
+            </div>
+          )}
+          {step === 1 && (
+            <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 animate-cinematic w-full pointer-events-none">
+              <div className="text-3xl md:text-7xl font-mono font-black text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.8)] mb-4 break-all px-2">
+                18,446,744,073,709,551,616
+              </div>
+              <div className="text-xl md:text-3xl text-cyan-400 font-light tracking-widest">颗星球的承诺</div>
+              <div className="mt-6 text-slate-300 text-sm md:text-base font-mono">[ 即使每秒探索一颗，也需要 5850 亿年 ]</div>
+            </div>
+          )}
+          {step === 2 && (
+            <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 animate-cinematic pointer-events-none">
+              <div className="text-4xl md:text-7xl font-black text-red-500 drop-shadow-[0_0_25px_rgba(239,68,68,0.8)] mb-6 tracking-tighter">
+                『 游戏史上的最大骗局 』
+              </div>
+              <div className="text-xl md:text-2xl text-slate-300 font-light tracking-widest">发售首日，口碑雪崩</div>
+            </div>
+          )}
+          {step === 3 && (
+            <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 animate-cinematic pointer-events-none">
+              <div className="text-4xl md:text-7xl font-black text-cyan-400 drop-shadow-[0_0_30px_rgba(34,211,238,0.8)] mb-8 tracking-tight">
+                『 史诗级的救赎奇迹 』
+              </div>
+              <div className="flex flex-col md:flex-row items-center gap-4 text-lg md:text-2xl text-white font-light tracking-widest">
+                <span>8年潜心重构</span>
+                <span className="hidden md:block w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_10px_rgba(34,211,238,1)]"></span>
+                <span>30+次免费巨型更新</span>
+                <span className="hidden md:block w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_10px_rgba(34,211,238,1)]"></span>
+                <span>口碑全线逆袭</span>
+              </div>
+            </div>
+          )}
+          {(step === 4 || step === 5) && (
+            <div className={`relative z-10 flex flex-col items-center justify-center text-center px-4 w-full max-w-5xl transition-all duration-[1200ms] ease-out origin-center
+              ${step === 4 ? 'animate-reveal' : 'opacity-0 scale-90 blur-xl pointer-events-none'}`}>
+              <h1 className="text-5xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white via-cyan-100 to-cyan-500 drop-shadow-[0_0_30px_rgba(34,211,238,0.4)] mb-2">
+                《无人深空》
+              </h1>
+              <h2 className="text-xl md:text-3xl font-mono tracking-[0.4em] text-cyan-400/80 mb-12 ml-4 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">
+                NO MAN'S SKY
+              </h2>
+              <div className="bg-slate-900/60 border border-cyan-500/40 p-6 md:p-10 rounded-2xl backdrop-blur-md mb-12 w-full max-w-3xl shadow-[0_0_40px_rgba(0,0,0,0.8)] relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 to-transparent"></div>
+                <div className="relative z-10">
+                  <div className="flex items-center justify-center gap-3 mb-6 opacity-70">
+                    <Cpu className="w-5 h-5 text-cyan-400" />
+                    <span className="text-cyan-400 text-sm font-mono tracking-widest uppercase">System Override / Presentation Mode</span>
+                  </div>
+                  <div className="space-y-4 text-slate-300 text-lg md:text-xl font-light">
+                    <p>主讲人：<span className="text-white font-bold border-b-2 border-cyan-500 px-1">陈羿涛</span></p>
+                    <p className="pt-2">不谈玩法说明书，带你看透<span className="text-cyan-400 font-bold px-2">底层代码</span></p>
+                    <p className="text-white font-medium text-xl md:text-3xl pt-4 drop-shadow-md">探寻“AI算法”创造宇宙的奇迹。</p>
+                  </div>
+                </div>
+              </div>
+              <button 
+                onClick={handleStart}
+                className={`group relative px-8 py-4 md:px-12 md:py-5 bg-cyan-950/70 overflow-hidden rounded-full border border-cyan-400 text-cyan-400 transition-all duration-300 hover:scale-105 hover:bg-cyan-900 hover:text-white hover:shadow-[0_0_40px_rgba(34,211,238,0.8)] focus:outline-none backdrop-blur-md ${step === 4 ? 'pointer-events-auto' : 'pointer-events-none'}`}
+              >
+                <div className="absolute inset-0 bg-cyan-400 opacity-0 group-hover:opacity-20 transition-opacity"></div>
+                <span className="relative z-10 font-mono font-bold text-base md:text-xl tracking-widest uppercase flex items-center gap-3">
+                  [ 接入星海终端 ] <Activity className="w-6 h-6 animate-pulse" />
+                </span>
+              </button>
+              <p className="text-slate-500 text-xs mt-6 font-mono tracking-widest uppercase animate-pulse">
+                 [ 按 F 键切换全屏演示 ]
+              </p>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    // --- 主应用组件 (编年史时间轴) ---
+    function MainApp({ onEnterPCG }) {
+      const [activeIndex, setActiveIndex] = useState(0);
+      const [isWarping, setIsWarping] = useState(false);
+      const [displayText, setDisplayText] = useState('');
+      const [mousePos, setMousePos] = useState({ x: 0, y: 0 }); 
+      
+      const current = milestones[activeIndex];
+      const Icon = current.icon;
+
+      const handleWarp = (newIndex) => {
+        if (newIndex === activeIndex || newIndex < 0 || newIndex >= milestones.length) return;
+        setIsWarping(true);
+        setTimeout(() => {
+          setActiveIndex(newIndex);
+          setIsWarping(false);
+        }, 600);
+      };
+
+      useEffect(() => {
+        let i = 0;
+        setDisplayText('');
+        if (isWarping) return;
+        
+        const text = current.desc;
+        const interval = setInterval(() => {
+          setDisplayText(text.substring(0, i));
+          i++;
+          if (i > text.length) clearInterval(interval);
+        }, 30);
+
+        return () => clearInterval(interval);
+      }, [activeIndex, isWarping]);
+
+      useEffect(() => {
+        const handleMouseMove = (e) => {
+          const x = (e.clientX / window.innerWidth - 0.5) * 40; 
+          const y = (e.clientY / window.innerHeight - 0.5) * 40;
+          setMousePos({ x, y });
+        };
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+      }, []);
+
+      const isLastNode = activeIndex === milestones.length - 1;
+
+      return (
+        <div className="relative min-h-screen bg-slate-950 text-slate-100 font-sans overflow-hidden flex flex-col selection:bg-cyan-500/30 animate-[fadeIn_1.5s_ease-in-out]">
+          <div className="absolute inset-0 z-0 transition-transform duration-[400ms] ease-out" style={{ transform: `translate(${mousePos.x * -0.5}px, ${mousePos.y * -0.5}px)` }}>
+            <Starfield density={60} />
+          </div>
+
+          <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden mix-blend-screen">
+            <div className={`absolute top-1/4 -left-1/4 w-[120vw] h-[120vh] ${current.bgColor} rounded-full filter blur-[150px] opacity-10 transition-all duration-[2000ms] ease-in-out`} style={{ transform: `translate(${mousePos.x * -1.5}px, ${mousePos.y * -1.5}px)` }}></div>
+            <div className={`absolute -bottom-1/4 -right-1/4 w-[100vw] h-[100vh] ${current.bgColor} rounded-full filter blur-[120px] opacity-20 transition-all duration-[2000ms] ease-in-out`} style={{ transform: `translate(${mousePos.x * -1}px, ${mousePos.y * -1}px)` }}></div>
+          </div>
+
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_0%,_rgba(2,6,23,0.9)_100%)] pointer-events-none z-0"></div>
+          <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:100%_4px] z-50 opacity-20"></div>
+          <div className={`absolute inset-0 bg-white z-40 transition-opacity duration-300 pointer-events-none ${isWarping ? 'opacity-100' : 'opacity-0'}`}></div>
+
+          <header className="relative z-10 flex justify-between items-center p-4 md:p-6 border-b border-white/10 bg-black/40 backdrop-blur-md">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full border-2 border-cyan-400 flex items-center justify-center relative overflow-hidden group">
+                <div className="absolute inset-0 bg-cyan-400/20 group-hover:bg-cyan-400/40 transition-colors"></div>
+                <Crosshair className="text-cyan-400 w-6 h-6 animate-spin-slow" />
+              </div>
+              <div>
+                <h1 className="text-xl md:text-2xl font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 uppercase">
+                  无人深空编年史
+                </h1>
+                <p className="text-xs tracking-[0.2em] text-cyan-500/70 uppercase">No Man's Sky Evolution Tracker</p>
+              </div>
+            </div>
+            
+            <div className="hidden md:flex flex-col items-end">
+              <div className="flex items-center gap-2 text-xs font-mono text-cyan-400/80">
+                <Activity className="w-4 h-4" />
+                <span>SYSTEM STATUS: ONLINE</span>
+              </div>
+              <div className="text-[10px] font-mono text-slate-500 tracking-widest">
+                COORDINATES: {Math.random().toString(16).substring(2, 8).toUpperCase()}:{Math.random().toString(16).substring(2, 6).toUpperCase()}
+              </div>
+            </div>
+          </header>
+
+          <main className="relative z-10 flex-grow flex flex-col md:flex-row items-center justify-center p-4 md:p-8 gap-8 max-w-7xl mx-auto w-full">
+            <div className={`w-full md:w-1/2 flex justify-center transition-all duration-500 transform ${isWarping ? 'scale-50 opacity-0 blur-md' : 'scale-100 opacity-100 blur-0'}`}>
+              <div style={{ transform: `translate(${mousePos.x * 0.8}px, ${mousePos.y * 0.8}px)`, transition: 'transform 0.3s ease-out' }}>
+                <div className="relative group animate-float">
+                  <div className={`absolute inset-0 rounded-full blur-3xl opacity-20 ${current.bgColor} transition-colors duration-1000`}></div>
+                  
+                  <div className={`relative w-64 h-64 md:w-80 md:h-80 rounded-full border-4 ${current.borderColor} bg-slate-900/80 flex items-center justify-center backdrop-blur-sm shadow-[0_0_30px_rgba(0,0,0,0.5)] transition-colors duration-500`}>
+                    <Icon className={`w-32 h-32 md:w-40 md:h-40 ${current.color} drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] transition-colors duration-500`} />
+                    <div className="absolute inset-[-10%] border border-white/10 rounded-full animate-[spin_10s_linear_infinite]"></div>
+                    <div className="absolute inset-[-20%] border border-white/5 rounded-full animate-[spin_15s_linear_infinite_reverse]"></div>
+                    <div className={`absolute -top-2 left-1/2 w-4 h-4 rounded-full ${current.bgColor} animate-ping`}></div>
+                  </div>
+                  
+                  <div className={`absolute bottom-[-20px] left-1/2 transform -translate-x-1/2 px-6 py-2 rounded-full border ${current.borderColor} bg-slate-950/90 backdrop-blur-md text-xs font-mono font-bold tracking-widest ${current.color}`}>
+                    {current.status}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={`w-full md:w-1/2 flex flex-col gap-6 transition-all duration-700 delay-100 ${isWarping ? 'translate-x-10 opacity-0' : 'translate-x-0 opacity-100'}`}>
+              <div style={{ transform: `translate(${mousePos.x * 1.2}px, ${mousePos.y * 1.2}px)`, transition: 'transform 0.3s ease-out' }} className="w-full">
+                <div className="animate-float-delayed flex flex-col gap-6 w-full">
+                  <div className="bg-slate-900/60 border border-slate-700 p-6 md:p-8 rounded-xl backdrop-blur-md relative overflow-hidden shadow-2xl">
+                    <div className={`absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 ${current.borderColor} rounded-tl-xl`}></div>
+                    <div className={`absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 ${current.borderColor} rounded-br-xl`}></div>
+                    
+                    <div className="flex items-center gap-3 mb-2">
+                      <Database className="w-5 h-5 text-slate-400" />
+                      <span className="font-mono text-slate-400 tracking-widest text-sm">ARCHIVE RECORD // {current.date}</span>
+                    </div>
+                    
+                    <h2 className={`text-3xl md:text-5xl font-black mb-4 tracking-tight ${current.color} drop-shadow-md`}>
+                      {current.name}
+                    </h2>
+                    
+                    <div className="h-px w-full bg-gradient-to-r from-white/20 to-transparent mb-6"></div>
+                    
+                    <div className="min-h-[120px]">
+                      <p className="text-slate-300 text-lg leading-relaxed font-light">
+                        {displayText}
+                        <span className={`inline-block w-2 h-5 ml-1 align-middle ${current.bgColor} animate-pulse`}></span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <button 
+                      onClick={() => handleWarp(activeIndex - 1)}
+                      disabled={activeIndex === 0}
+                      className={`relative overflow-hidden flex items-center justify-center gap-2 py-4 px-6 rounded-lg font-mono font-bold tracking-wider transition-all duration-300 group
+                        ${activeIndex === 0 
+                          ? 'bg-slate-900/50 text-slate-700 cursor-not-allowed border border-slate-800/50' 
+                          : 'bg-slate-800/50 text-slate-300 hover:bg-slate-700/80 hover:text-white border border-slate-700 hover:border-slate-500 shadow-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.1)]'}`}
+                    >
+                      {activeIndex !== 0 && <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.05)_0%,_transparent_70%)]"></div>}
+                      <span className="relative z-10 flex items-center gap-2">
+                        <ChevronLeft className={`w-5 h-5 ${activeIndex !== 0 && 'group-hover:-translate-x-1 transition-transform'}`} />
+                        上个星系
+                      </span>
+                    </button>
+                    
+                    <button 
+                      onClick={() => {
+                        if (isLastNode) onEnterPCG();
+                        else handleWarp(activeIndex + 1);
+                      }}
+                      className={`relative overflow-hidden flex items-center justify-center gap-2 py-4 px-6 rounded-lg font-mono font-bold tracking-widest transition-all duration-500 group shadow-lg
+                        ${isLastNode 
+                          ? 'bg-purple-950/50 border border-purple-500/30 text-purple-400 hover:bg-purple-900/80 hover:text-white hover:border-purple-400 hover:shadow-[0_0_30px_rgba(168,85,247,0.6)]' 
+                          : 'bg-cyan-950/50 border border-cyan-700/50 text-cyan-400 hover:bg-cyan-900/80 hover:text-white hover:border-cyan-400 hover:shadow-[0_0_30px_rgba(34,211,238,0.5)]'}`}
+                    >
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-500 bg-[repeating-linear-gradient(45deg,transparent,transparent_2px,rgba(255,255,255,0.1)_2px,rgba(255,255,255,0.1)_4px)]"></div>
+                      
+                      <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] ${isLastNode ? 'from-purple-500/30' : 'from-cyan-400/30'} to-transparent`}></div>
+
+                      <span className="relative z-10 flex items-center gap-2">
+                        {isLastNode ? '揭晓底层真理' : '启动跃迁'}
+                        {isLastNode ? (
+                          <Binary className="w-5 h-5 group-hover:animate-pulse ml-1" />
+                        ) : (
+                          <Rocket className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:scale-110 transition-all duration-300" />
+                        )}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+
+          <footer className="relative z-10 w-full bg-slate-950/90 border-t border-cyan-900/30 backdrop-blur-xl mt-auto shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent"></div>
+            
+            <div className="max-w-7xl mx-auto px-6 md:px-16 pt-8 pb-14 relative">
+              
+              <div className="flex items-center justify-between mb-16">
+                <div className="text-xs font-mono text-slate-400 tracking-[0.3em] uppercase flex items-center gap-3">
+                  <span className="w-2 h-2 bg-cyan-500 rounded-sm animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.8)]"></span>
+                  Navigation Star Map // <span className="text-cyan-400 font-bold ml-1 border-b border-cyan-500/50">Sector {activeIndex + 1}</span>
+                </div>
+                <div className="hidden md:flex text-xs font-mono text-slate-500 tracking-widest bg-slate-900 px-3 py-1 rounded border border-slate-700">
+                  SYNC: {Math.round((activeIndex / (milestones.length - 1)) * 100)}%
+                </div>
+              </div>
+              
+              <div className="relative flex items-center justify-between w-full">
+                <div className="absolute left-0 right-0 h-[2px] top-1/2 transform -translate-y-1/2 z-0">
+                  <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,rgba(148,163,184,0.1),rgba(148,163,184,0.1)_4px,transparent_4px,transparent_8px)]"></div>
+                  
+                  <div 
+                    className="absolute left-0 top-0 bottom-0 transition-all duration-1000 ease-out bg-gradient-to-r from-blue-600 via-cyan-400 to-cyan-200 shadow-[0_0_15px_rgba(34,211,238,0.6)]"
+                    style={{ width: `${(activeIndex / (milestones.length - 1)) * 100}%` }}
+                  >
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-6 md:w-8 h-[2px] bg-white blur-[1px] shadow-[0_0_10px_white]"></div>
+                  </div>
+                </div>
+
+                {milestones.map((milestone, index) => {
+                  const isActive = index === activeIndex;
+                  const isPast = index < activeIndex;
+                  return (
+                    <div key={milestone.id} className="relative z-10 flex flex-col items-center group cursor-pointer" onClick={() => handleWarp(index)}>
+                      
+                      <div className={`absolute -top-14 md:-top-16 text-white transition-all duration-700 transform ${isActive ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-50'}`}>
+                        <Rocket className={`w-6 h-6 md:w-7 md:h-7 animate-bounce ${milestone.color} drop-shadow-[0_0_10px_currentColor]`} />
+                        <div className={`w-px h-3 md:h-4 mx-auto ${milestone.bgColor} opacity-50 mt-1`}></div>
+                      </div>
+
+                      <div className="relative flex items-center justify-center">
+                        {isActive && <div className={`absolute w-8 h-8 md:w-10 md:h-10 rounded-full border border-dashed ${milestone.borderColor} animate-[spin_4s_linear_infinite]`}></div>}
+                        
+                        <div className={`w-3 h-3 md:w-4 md:h-4 rotate-45 transition-all duration-500 flex items-center justify-center
+                          ${isActive ? `${milestone.bgColor} border border-white shadow-[0_0_20px_currentColor] scale-125` : isPast ? 'bg-cyan-800 border border-cyan-400/50' : 'bg-slate-900 border border-slate-600 group-hover:border-slate-400 group-hover:scale-125'}`}
+                        >
+                           {isActive && <div className="w-1.5 h-1.5 bg-white rounded-sm animate-ping"></div>}
+                           {isPast && !isActive && <div className="w-1 h-1 bg-cyan-300 rounded-sm"></div>}
+                        </div>
+                      </div>
+
+                      <div className={`absolute top-6 md:top-8 flex flex-col items-center transition-colors duration-300 w-24 text-center pointer-events-none`}>
+                         <div className={`w-px h-3 md:h-4 mb-2 transition-colors duration-300 ${isActive ? milestone.bgColor : isPast ? 'bg-cyan-800' : 'bg-slate-800'}`}></div>
+                         
+                         <div className={`text-[9px] md:text-[11px] font-mono whitespace-nowrap ${isActive ? 'text-white font-bold drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]' : 'text-slate-500 group-hover:text-slate-300'}`}>
+                           {milestone.date}
+                         </div>
+                         
+                         <div className={`hidden md:block text-[10px] font-sans mt-1 tracking-wide w-24 truncate ${isActive ? milestone.color : 'text-slate-600 group-hover:text-slate-400'}`}>
+                           {milestone.name.split('/')[0].trim()}
+                         </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </footer>
+        </div>
+      );
+    }
+
+    // --- PCG创世核心与其他流派对比 ---
+    const PCGSection = ({ onNext }) => {
+      const [step, setStep] = useState(0); 
+      const [seedInput, setSeedInput] = useState('');
+      const [planetData, setPlanetData] = useState(null);
+      const [isGenerating, setIsGenerating] = useState(false);
+      const [fakeCode, setFakeCode] = useState([]);
+      const [hoveredGame, setHoveredGame] = useState(null);
+      const [dopaminePowered, setDopaminePowered] = useState(false);
+
+      useEffect(() => {
+        if (step === 1) {
+          const t = setTimeout(() => setDopaminePowered(true), 800);
+          return () => clearTimeout(t);
+        } else {
+          setDopaminePowered(false);
+          setHoveredGame(null);
+        }
+      }, [step]);
+
+      const generatePlanet = (seedStr) => {
+        setIsGenerating(true);
+        setPlanetData(null);
+        
+        const codes = Array(20).fill(0).map(() => 
+          `0x${Math.floor(Math.random()*16777215).toString(16).toUpperCase()} ${Math.random().toString(36).substring(2, 10).toUpperCase()} INIT_SEQ...`
+        );
+        setFakeCode(codes);
+
+        let hash = 0;
+        const str = seedStr.trim() || "ATLAS_NODE_" + Math.floor(Math.random() * 9999);
+        for (let i = 0; i < str.length; i++) {
+            hash = ((hash << 5) - hash) + str.charCodeAt(i);
+            hash |= 0; 
+        }
+        
+        const colors = ['#06b6d4', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b', '#ef4444', '#cbd5e1'];
+        const biomes = ['剧毒真菌', '冰冻荒原', '灼热焦土', '辐射异变', '繁茂丛林', '枯竭死星', '无气晶体'];
+        const weathers = ['沸腾酸雨', '永恒风暴', '平静清澈', '引力异常', '致命强风', '极光弥漫'];
+        
+        const absHash = Math.abs(hash);
+        const color1 = colors[absHash % colors.length];
+        const color2 = colors[(absHash >> 2) % colors.length];
+        const biome = biomes[(absHash >> 4) % biomes.length];
+        const weather = weathers[(absHash >> 6) % weathers.length];
+        const temp = (absHash % 300) - 100; 
+        const gravity = (0.5 + (absHash % 15) / 10).toFixed(2); 
+
+        setTimeout(() => {
+          setIsGenerating(false);
+          setPlanetData({
+            seed: str.toUpperCase(),
+            color1, color2, biome, weather, temp, gravity
+          });
+        }, 2500); 
+      };
+
+      return (
+        <div className="fixed inset-0 z-50 bg-black text-slate-300 font-mono flex flex-col items-center justify-center overflow-hidden selection:bg-cyan-500/30">
+          <Starfield density={30} dark={true} />
+          
+          <div className="relative z-10 w-full max-w-6xl p-6 flex flex-col items-center h-full justify-center">
+            
+            {step === 0 && (
+              <div className="animate-fadeIn flex flex-col items-center text-center w-full">
+                <h3 className="text-xl md:text-2xl text-cyan-500/80 mb-12 tracking-[0.4em] uppercase font-light">
+                  <span className="text-white font-bold">动作冒险生存</span> / 开放宇宙探索
+                </h3>
+                <div className="relative w-72 h-72 mb-16">
+                   <div className="absolute inset-0 m-auto w-16 h-16 rounded-full bg-slate-900 border border-slate-700 shadow-[0_0_20px_rgba(255,255,255,0.1)] flex items-center justify-center z-10 animate-pulse">
+                      <Globe className="text-slate-400 w-8 h-8" />
+                   </div>
+                   <div className="absolute inset-0 m-auto w-56 h-56 rounded-full border border-slate-800/80 animate-[spin_15s_linear_infinite]"></div>
+                   <div className="absolute inset-0 m-auto w-[270px] h-[270px] rounded-full border border-dashed border-slate-800/40 animate-[spin_20s_linear_infinite_reverse]"></div>
+                   <div className="absolute inset-0 m-auto w-56 h-56 animate-[spin_15s_linear_infinite]">
+                     <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center border border-cyan-500/50 text-cyan-400 animate-[spin_15s_linear_infinite_reverse] shadow-[0_0_15px_rgba(34,211,238,0.2)]">
+                       <Pickaxe className="w-5 h-5"/>
+                     </div>
+                     <div className="absolute top-1/2 -right-6 -translate-y-1/2 w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center border border-purple-500/50 text-purple-400 animate-[spin_15s_linear_infinite_reverse] shadow-[0_0_15px_rgba(168,85,247,0.2)]">
+                       <Search className="w-5 h-5"/>
+                     </div>
+                     <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center border border-red-500/50 text-red-400 animate-[spin_15s_linear_infinite_reverse] shadow-[0_0_15px_rgba(239,68,68,0.2)]">
+                       <Swords className="w-5 h-5"/>
+                     </div>
+                     <div className="absolute top-1/2 -left-6 -translate-y-1/2 w-12 h-12 bg-slate-900 rounded-full flex items-center justify-center border border-yellow-500/50 text-yellow-400 animate-[spin_15s_linear_infinite_reverse] shadow-[0_0_15px_rgba(234,179,8,0.2)]">
+                       <Coins className="w-5 h-5"/>
+                     </div>
+                   </div>
+                </div>
+                <div className="text-lg md:text-xl leading-relaxed max-w-2xl text-slate-300 font-light space-y-4">
+                  <p className="flex items-center justify-center gap-3 text-cyan-100">
+                    挖矿求生 <ChevronRight className="w-4 h-4 text-slate-600"/> 探索资源 <ChevronRight className="w-4 h-4 text-slate-600"/> 遭遇海盗 <ChevronRight className="w-4 h-4 text-slate-600"/> 空间站交易
+                  </p>
+                  <p className="text-slate-500 text-sm">
+                    四个齿轮紧密咬合，构成了游戏的基础玩法循环。<br/>
+                    <span className="text-slate-300 mt-2 inline-block">但这并不稀奇。</span>
+                  </p>
+                </div>
+                <div className="mt-12 flex justify-center w-full">
+                  <button onClick={() => setStep(1)} className="group relative px-6 py-3 bg-slate-900/80 border border-cyan-500/50 text-cyan-400 rounded-full hover:bg-cyan-900/50 hover:text-cyan-100 hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] transition-all flex items-center gap-3 backdrop-blur-sm">
+                    <Search className="w-5 h-5 animate-pulse" />
+                    <span className="font-mono tracking-widest uppercase text-sm">扫描宇宙异常现象</span>
+                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {step === 1 && (
+              <div className="animate-fadeIn flex flex-col items-center text-center w-full max-w-6xl">
+                <div className="flex items-center gap-3 mb-8 opacity-90 border border-cyan-500/30 px-6 py-2 rounded-full bg-cyan-950/30 shadow-[0_0_15px_rgba(34,211,238,0.2)]">
+                  <Activity className="w-5 h-5 text-cyan-400 animate-pulse" />
+                  <span className="text-cyan-300 font-mono tracking-widest text-sm uppercase">星际流派雷达全息扫描</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mb-12 relative">
+                   <div className="absolute inset-0 pointer-events-none rounded-xl overflow-hidden opacity-20">
+                     <div className="w-full h-1 bg-cyan-400 animate-warp-lines shadow-[0_0_15px_#22d3ee]"></div>
+                   </div>
+                   <div 
+                     className={`relative bg-slate-900/60 border p-6 rounded-xl backdrop-blur-md flex flex-col items-center transition-all duration-500 cursor-default
+                       ${hoveredGame === 'ow' ? 'scale-105 border-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.3)]' : 
+                         hoveredGame ? 'opacity-40 scale-95 border-slate-700' : 'border-slate-600 hover:border-orange-400/50'}`}
+                     onMouseEnter={() => setHoveredGame('ow')} onMouseLeave={() => setHoveredGame(null)}
+                   >
+                     <div className="absolute top-2 right-2 flex gap-1">
+                       <span className="w-2 h-2 rounded-full bg-orange-500 animate-ping"></span>
+                     </div>
+                     <Compass className={`w-12 h-12 text-orange-400 mb-4 transition-transform duration-700 ${hoveredGame === 'ow' ? 'rotate-180 scale-110' : ''}`} />
+                     <h4 className="text-xl font-bold text-slate-200 mb-1">星际拓荒</h4>
+                     <p className="text-[10px] font-mono text-orange-500/80 mb-4 tracking-widest uppercase">Outer Wilds</p>
+                     <div className="text-sm text-slate-400 leading-relaxed h-20">
+                       极其精致的<span className="text-orange-400 font-bold">「手工盆景」</span><br/>宇宙微小却充满深邃谜题与动人叙事
+                     </div>
+                   </div>
+                   <div 
+                     className={`relative bg-cyan-950/40 border-2 p-6 rounded-xl backdrop-blur-md flex flex-col items-center transition-all duration-500 cursor-default
+                       ${hoveredGame === 'nms' ? 'scale-110 border-cyan-400 shadow-[0_0_40px_rgba(34,211,238,0.4)] z-10' : 
+                         hoveredGame ? 'opacity-40 scale-95 border-cyan-800' : 'border-cyan-500 shadow-[0_0_20px_rgba(34,211,238,0.2)] md:scale-105'}`}
+                     onMouseEnter={() => setHoveredGame('nms')} onMouseLeave={() => setHoveredGame(null)}
+                   >
+                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(34,211,238,0.15)_0%,_transparent_70%)] rounded-xl pointer-events-none"></div>
+                     <InfinityIcon className={`w-14 h-14 text-cyan-400 mb-4 drop-shadow-[0_0_15px_rgba(34,211,238,0.8)] transition-all duration-700 ${hoveredGame === 'nms' ? 'animate-spin-slow scale-110' : ''}`} />
+                     <h4 className="text-2xl font-black text-white mb-1 tracking-widest drop-shadow-md">无人深空</h4>
+                     <p className="text-[10px] font-mono text-cyan-400 mb-4 tracking-widest uppercase">No Man's Sky</p>
+                     <div className="text-sm text-cyan-100 leading-relaxed h-20 flex flex-col justify-center">
+                       核心魅力在于纯粹的<br/>
+                       <span className="text-cyan-300 font-bold text-base md:text-lg inline-block mt-2 tracking-widest bg-cyan-900/80 border border-cyan-400/50 px-3 py-1 rounded shadow-[0_0_10px_rgba(34,211,238,0.3)]">「尺度感与积累爽感」</span>
+                     </div>
+                   </div>
+                   <div 
+                     className={`relative bg-slate-900/60 border p-6 rounded-xl backdrop-blur-md flex flex-col items-center transition-all duration-500 cursor-default
+                       ${hoveredGame === 'sc' ? 'scale-105 border-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.3)]' : 
+                         hoveredGame ? 'opacity-40 scale-95 border-slate-700' : 'border-slate-600 hover:border-blue-400/50'}`}
+                     onMouseEnter={() => setHoveredGame('sc')} onMouseLeave={() => setHoveredGame(null)}
+                   >
+                     <div className="absolute top-2 right-2 flex gap-1">
+                       <span className="w-1.5 h-4 bg-blue-500 animate-pulse rounded-sm"></span>
+                       <span className="w-1.5 h-4 bg-blue-500/50 rounded-sm"></span>
+                       <span className="w-1.5 h-4 bg-blue-500/20 rounded-sm"></span>
+                     </div>
+                     <Settings className={`w-12 h-12 text-blue-400 mb-4 transition-transform duration-700 ${hoveredGame === 'sc' ? 'rotate-90 scale-110' : ''}`} />
+                     <h4 className="text-xl font-bold text-slate-200 mb-1">星际公民</h4>
+                     <p className="text-[10px] font-mono text-blue-500/80 mb-4 tracking-widest uppercase">Star Citizen</p>
+                     <div className="text-sm text-slate-400 leading-relaxed h-20">
+                       追求极致的<span className="text-blue-400 font-bold">「硬核模拟」</span><br/>物理引擎精确至起飞的十几个开关
+                     </div>
+                   </div>
+                </div>
+                <div className={`w-full flex items-center mb-6 transition-all duration-1000 ${dopaminePowered ? 'opacity-100' : 'opacity-0'}`}>
+                  <div className="h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent flex-1"></div>
+                  <span className="px-4 text-cyan-400 font-mono text-sm tracking-widest uppercase animate-pulse">Core Dopamine Engine</span>
+                  <div className="h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent flex-1"></div>
+                </div>
+                <div className="flex flex-col md:flex-row gap-6 w-full">
+                  <div className={`flex-1 bg-slate-900/80 border border-purple-500/30 rounded-xl p-6 relative overflow-hidden group transition-all duration-1000 transform ${dopaminePowered ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="flex items-center justify-between mb-4 border-b border-purple-900/50 pb-3">
+                      <span className="text-purple-400 font-mono text-xs tracking-widest uppercase flex items-center gap-2">
+                        <Database className="w-4 h-4"/> 积累模块 Module_01
+                      </span>
+                      <div className="w-24 h-2 bg-slate-800 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full animate-accumulate-bar"></div>
+                      </div>
+                    </div>
+                    <h3 className="text-xl md:text-2xl font-bold text-white mb-4 group-hover:text-purple-300 transition-colors">从蝼蚁到神明的生存多巴胺</h3>
+                    <p className="text-slate-400 text-sm leading-relaxed text-left relative z-10">
+                      起初只是面罩漏气、随时致命的太空难民。<br/>历经数十小时循环与攀科技，终能组建庞大星际舰队、买下空间站、在异星表面筑起赛博基地。<br/>
+                      <span className="text-purple-300 block mt-3 font-medium border-l-2 border-purple-500 pl-3 bg-purple-950/30 p-2 rounded-r backdrop-blur-sm">
+                        养成感精准击中了人类将“致命未知”征服为“私人后花园”的囤积本能。
+                      </span>
+                    </p>
+                  </div>
+                  <div className={`flex-1 bg-slate-900/80 border border-blue-500/30 rounded-xl p-6 relative overflow-hidden group transition-all duration-1000 delay-200 transform ${dopaminePowered ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="absolute top-0 right-0 w-32 h-32 opacity-20 pointer-events-none overflow-hidden rounded-bl-full">
+                      <div className="w-[1px] h-20 bg-blue-400 absolute right-4 top-0 animate-warp-lines"></div>
+                      <div className="w-[2px] h-16 bg-blue-300 absolute right-10 top-[-20px] animate-warp-lines" style={{animationDelay: '0.3s'}}></div>
+                      <div className="w-[1px] h-24 bg-blue-500 absolute right-16 top-[-40px] animate-warp-lines" style={{animationDelay: '0.7s'}}></div>
+                    </div>
+                    <div className="flex items-center justify-between mb-4 border-b border-blue-900/50 pb-3">
+                      <span className="text-blue-400 font-mono text-xs tracking-widest uppercase flex items-center gap-2">
+                        <Rocket className="w-4 h-4"/> 跃迁模块 Module_02
+                      </span>
+                      <div className="flex gap-1">
+                        <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
+                        <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" style={{animationDelay: '0.2s'}}></span>
+                      </div>
+                    </div>
+                    <h3 className="text-xl md:text-2xl font-bold text-white mb-4 group-hover:text-blue-300 transition-colors">打破边界的无缝浪漫</h3>
+                    <p className="text-slate-400 text-sm leading-relaxed text-left relative z-10">
+                      坐进驾驶舱、点火升空、冲破大气层驶向深空、直到降落另一颗星球...<span className="text-white font-bold px-1">全程无一次黑屏 Loading</span>。<br/>
+                      <span className="text-blue-300 block mt-3 font-medium border-l-2 border-blue-500 pl-3 bg-blue-950/30 p-2 rounded-r backdrop-blur-sm">
+                        挣脱重力束缚、看着母星缩小的连贯视觉体验，带来了极其强烈的“自由错觉”与肾上腺素飙升。
+                      </span>
+                    </p>
+                  </div>
+                </div>
+                <div className={`mt-12 flex justify-center w-full transition-all duration-1000 delay-500 ${dopaminePowered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}>
+                  <button onClick={() => setStep(2)} className="group relative px-8 py-4 bg-red-950/40 border border-red-500/50 text-red-400 rounded-full hover:bg-red-900/80 hover:text-red-100 hover:shadow-[0_0_20px_rgba(239,68,68,0.4)] transition-all flex items-center gap-3 backdrop-blur-sm">
+                    <AlertTriangle className="w-5 h-5 group-hover:animate-pulse" />
+                    <span className="font-mono font-bold tracking-widest uppercase text-sm md:text-base">追溯“无穷尺度”引发的底层悖论</span>
+                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {step === 2 && (
+              <div className="animate-fadeIn flex flex-col items-center text-center">
+                <AlertTriangle className="w-24 h-24 text-red-500 mb-8 animate-pulse drop-shadow-[0_0_20px_rgba(239,68,68,0.5)]" />
+                <h2 className="text-3xl md:text-5xl font-black text-red-500 mb-8 tracking-tighter">
+                  18,446,744,073,709,551,616
+                </h2>
+                <div className="text-xl md:text-2xl leading-relaxed max-w-3xl text-slate-300 font-light border-y border-red-900/50 py-6 bg-red-950/10">
+                  <p className="mb-4">如果是靠美术一张张画、策划一个个配...</p>
+                  <p className="text-red-400 font-bold bg-red-950/50 px-4 py-2 inline-block rounded border border-red-800">
+                    地球上所有的硬盘加起来都会被撑爆。
+                  </p>
+                </div>
+                <div className="mt-12 flex justify-center w-full animate-fadeIn">
+                  <button onClick={() => setStep(3)} className="group relative px-6 py-3 bg-red-950/50 border border-red-500/50 text-red-400 rounded-full hover:bg-red-900/80 hover:text-red-100 hover:shadow-[0_0_20px_rgba(239,68,68,0.4)] transition-all flex items-center gap-3 backdrop-blur-sm">
+                    <Database className="w-5 h-5" />
+                    <span className="font-mono tracking-widest uppercase text-sm">解析底层逻辑真相</span>
+                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {step === 3 && (
+              <div className="animate-fadeIn flex flex-col items-center text-center">
+                <Binary className="w-20 h-20 text-cyan-400 mb-8 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]" />
+                <h2 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-500 mb-4 tracking-widest">
+                  PCG 创世引擎
+                </h2>
+                <h3 className="text-xl text-cyan-500/80 tracking-[0.3em] mb-12 uppercase font-light">程序化内容生成技术</h3>
+                <div className="text-left text-lg md:text-xl leading-relaxed max-w-3xl text-slate-300 font-light border-l-4 border-cyan-500 pl-8 space-y-4">
+                  <p>真正让它载入史册的，是创造宇宙的底层逻辑。</p>
+                  <p>
+                    开发团队实际上只写了一个 <span className="text-cyan-400 font-bold border-b border-cyan-400/50">“超级公式”</span>。<br/>
+                    高山、大海、奇形怪状的生物，都不是人工绘制的。
+                  </p>
+                  <p className="text-cyan-100">
+                    而是系统输入一个随机种子(Seed)后，靠电脑显卡 <span className="font-bold">实时运算</span> 出来的奇迹。
+                  </p>
+                </div>
+                <div className="mt-16 flex justify-center w-full animate-fadeIn">
+                  <button onClick={() => setStep(4)} className="group relative px-8 py-4 bg-cyan-950/80 border border-cyan-400 text-cyan-400 rounded-full hover:bg-cyan-900 hover:text-white hover:shadow-[0_0_30px_rgba(34,211,238,0.6)] transition-all flex items-center gap-3 backdrop-blur-md">
+                    <Terminal className="w-6 h-6 animate-pulse" />
+                    <span className="font-mono font-bold tracking-widest uppercase">接入创世终端</span>
+                    <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {step === 4 && (
+              <div className="animate-fadeIn w-full flex flex-col items-center justify-center">
+                <div className="text-center mb-10 w-full animate-float-delayed">
+                  <p className="text-cyan-400 tracking-[0.4em] uppercase mb-4 text-sm font-bold flex items-center justify-center gap-2">
+                    <Hash className="w-4 h-4"/> 降本增效的极致范例
+                  </p>
+                  <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto font-light leading-relaxed">
+                    十几个人的团队，用一行行纯粹的数学公式，取代了成百上千人的美术外包团队。
+                  </p>
+                </div>
+
+                {!planetData && (
+                  <div className="bg-slate-900/60 border border-cyan-500/30 p-8 md:p-10 rounded-2xl w-full max-w-2xl shadow-[0_0_50px_rgba(0,0,0,0.8)] relative overflow-hidden backdrop-blur-md">
+                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500/0 via-cyan-400 to-cyan-500/0"></div>
+                    <div className="absolute bottom-0 right-0 opacity-5 pointer-events-none">
+                      <Binary className="w-64 h-64 text-cyan-400 transform translate-x-1/4 translate-y-1/4"/>
+                    </div>
+                    <div className="flex items-center gap-3 mb-8 border-b border-slate-700/50 pb-4">
+                      <Terminal className="w-6 h-6 text-cyan-400" />
+                      <span className="text-cyan-400 font-bold tracking-widest text-lg">ATLAS_SEED_TERMINAL // v2.0</span>
+                    </div>
+                    
+                    {isGenerating ? (
+                       <div className="py-12 flex flex-col items-center">
+                         <div className="relative w-16 h-16 mb-6">
+                           <div className="absolute inset-0 rounded-full border-t-2 border-cyan-400 animate-spin"></div>
+                           <div className="absolute inset-2 rounded-full border-b-2 border-purple-400 animate-[spin_1s_linear_infinite_reverse]"></div>
+                           <div className="absolute inset-0 flex items-center justify-center"><Hash className="w-6 h-6 text-cyan-300 animate-pulse"/></div>
+                         </div>
+                         <p className="text-cyan-400 animate-pulse tracking-[0.2em] uppercase font-bold">解析超级公式中...</p>
+                         <div className="mt-6 font-mono text-[10px] md:text-xs text-cyan-500/50 overflow-hidden h-24 w-full relative flex flex-col">
+                           <div className="animate-code-scroll absolute w-full space-y-1 text-center">
+                             {fakeCode.map((c,i) => <div key={i}>{c}</div>)}
+                             {fakeCode.map((c,i) => <div key={i+20}>{c}</div>)}
+                           </div>
+                         </div>
+                       </div>
+                    ) : (
+                      <div className="relative z-10">
+                        <p className="text-slate-300 mb-6 text-sm leading-relaxed">
+                          接入创世引擎。请输入一段任意字符作为 <span className="text-cyan-400 font-bold">随机种子 (Seed)</span>：
+                        </p>
+                        <div className="flex flex-col md:flex-row gap-4">
+                          <div className="relative flex-1">
+                            <Key className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-500" />
+                            <input 
+                              type="text" 
+                              value={seedInput}
+                              onChange={(e) => setSeedInput(e.target.value)}
+                              placeholder="e.g. OMEGA-99"
+                              className="w-full bg-slate-950/80 border border-slate-600 text-cyan-300 pl-10 pr-4 py-4 rounded-lg focus:outline-none focus:border-cyan-400 font-mono uppercase tracking-widest shadow-inner transition-colors"
+                            />
+                          </div>
+                          <button 
+                            onClick={() => generatePlanet(seedInput)}
+                            className="bg-cyan-950/80 border border-cyan-500 text-cyan-400 px-8 py-4 rounded-lg hover:bg-cyan-900 hover:text-white hover:shadow-[0_0_20px_rgba(34,211,238,0.4)] transition-all uppercase font-bold tracking-widest flex items-center justify-center gap-2"
+                          >
+                            <Cpu className="w-5 h-5"/> 运算生成
+                          </button>
+                        </div>
+                        <p className="mt-4 text-[10px] text-slate-500 text-center uppercase tracking-widest">* 保持为空将自动生成随机乱数种子</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* 生成结果展示 - 跳转 VR */}
+                {planetData && (
+                  <div className="flex flex-col md:flex-row items-center gap-8 md:gap-16 animate-reveal w-full max-w-4xl justify-center">
+                    <div className="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center animate-float">
+                      <div className="absolute inset-0 rounded-full blur-3xl opacity-30 mix-blend-screen transition-all duration-1000" style={{ backgroundColor: planetData.color1 }}></div>
+                      <div className="relative w-52 h-52 md:w-64 md:h-64 rounded-full shadow-[inset_-25px_-25px_50px_rgba(0,0,0,0.9)] overflow-hidden transition-all duration-1000 transform hover:scale-105 cursor-pointer" style={{ background: `radial-gradient(circle at 35% 35%, ${planetData.color1}, ${planetData.color2}, #020617)` }}>
+                        <div className="absolute inset-0 opacity-40 mix-blend-overlay bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPjxyZWN0IHdpZHRoPSI4IiBoZWlnaHQ9IjgiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNCIvPjwvc3ZnPg==')]"></div>
+                      </div>
+                      <div className="absolute w-56 h-56 md:w-[270px] md:h-[270px] rounded-full border border-white/10 animate-[spin_10s_linear_infinite]"></div>
+                    </div>
+
+                    <div className="bg-slate-900/80 border border-slate-700/50 border-l-4 p-8 rounded-xl backdrop-blur-md min-w-[320px] shadow-2xl relative overflow-hidden" style={{ borderLeftColor: planetData.color1 }}>
+                      <div className="absolute top-0 right-0 bg-slate-800 text-[10px] px-3 py-1 text-slate-400 rounded-bl-lg">NO MAN'S SKY PCG</div>
+                      <p className="text-xs text-slate-400 mb-2 tracking-[0.2em]">NEW DISCOVERY</p>
+                      <h3 className="text-2xl text-white font-bold mb-6 tracking-widest break-all drop-shadow-md">PLANET_{planetData.seed}</h3>
+                      
+                      <div className="space-y-4 text-sm font-mono">
+                        <div className="flex justify-between border-b border-slate-800/80 pb-2">
+                          <span className="text-slate-500">地貌类型 Biome</span><span className="text-cyan-300 font-bold">{planetData.biome}</span>
+                        </div>
+                        <div className="flex justify-between border-b border-slate-800/80 pb-2">
+                          <span className="text-slate-500">天气状况 Weather</span><span className="text-cyan-300">{planetData.weather}</span>
+                        </div>
+                        <div className="flex justify-between border-b border-slate-800/80 pb-2">
+                          <span className="text-slate-500">重力系数 Gravity</span><span className="text-green-400">{planetData.gravity} G</span>
+                        </div>
+                        <div className="flex justify-between pt-2 bg-cyan-950/30 p-2 rounded border border-cyan-900 mt-4">
+                          <span className="text-cyan-500 font-bold">美术工时耗费</span><span className="text-white font-black bg-cyan-600 px-2 rounded">0 秒</span>
+                        </div>
+                      </div>
+
+                      <div className="mt-8 flex flex-col gap-4">
+                         <div className="flex gap-4">
+                           <button onClick={() => setPlanetData(null)} className="flex-1 border border-slate-600 text-slate-300 hover:bg-slate-800 hover:text-white py-3 rounded-lg text-xs tracking-widest uppercase transition-colors">
+                             [ 重新生成 ]
+                           </button>
+                         </div>
+                         
+                         {/* 前往 VR 版块 */}
+                         <button onClick={onNext} className="w-full bg-blue-950/80 text-blue-300 border border-blue-500/50 hover:bg-blue-900 hover:text-white hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] py-4 rounded-lg text-sm tracking-widest uppercase font-bold transition-all flex justify-center items-center gap-2 group mt-2">
+                           <Headset className="w-5 h-5 group-hover:animate-pulse" /> 启动跃迁：进入 VR 赋形
+                         </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    // --- 新增：裸眼 3D 视差特效的 VR 赋形板块 ---
+    const VRSection = ({ onNext }) => {
+      const [step, setStep] = useState(0);
+      const sceneRef = useRef(null);
+      const hudRef = useRef(null);
+      const uiRef = useRef(null);
+      const mouseRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
+
+      useEffect(() => {
+        if (step !== 1) return;
+        
+        const handleMouseMove = (e) => {
+          mouseRef.current.targetX = (e.clientX / window.innerWidth) * 2 - 1;
+          mouseRef.current.targetY = (e.clientY / window.innerHeight) * 2 - 1;
+        };
+        
+        window.addEventListener('mousemove', handleMouseMove);
+
+        let animationId;
+        const animate = () => {
+          const m = mouseRef.current;
+          // Lerp 平滑插值计算（阻尼感），0.03 的系数带来极其平滑的“太空漂浮”手感
+          m.x += (m.targetX - m.x) * 0.03;
+          m.y += (m.targetY - m.y) * 0.03;
+
+          // 核心 3D 透视场景（深空背景与巨物）- 提供主要的方向感偏转
+          if (sceneRef.current) {
+            sceneRef.current.style.transform = `perspective(800px) rotateX(${m.y * -12}deg) rotateY(${m.x * 18}deg)`;
+          }
+          
+          // HUD 准星与物理边框遮罩（反向位移，模拟镜框与眼球的相对运动）
+          if (hudRef.current) {
+            hudRef.current.style.transform = `translate(${m.x * -20}px, ${m.y * -20}px)`;
+          }
+          
+          // 交互面板（更贴近屏幕，小幅度平移）
+          if (uiRef.current) {
+            uiRef.current.style.transform = `translate(${m.x * -10}px, ${m.y * -10}px)`;
+          }
+
+          animationId = requestAnimationFrame(animate);
+        };
+        
+        animate();
+
+        return () => {
+          window.removeEventListener('mousemove', handleMouseMove);
+          cancelAnimationFrame(animationId);
+        };
+      }, [step]);
+
+      return (
+        <div className="fixed inset-0 z-50 bg-black text-slate-300 font-sans flex flex-col items-center justify-center overflow-hidden">
+          
+          {/* 星空底层背景 (仅在非 VR 模式下显示) */}
+          {step === 0 && <Starfield density={80} dark={true} />}
+
+          {/* 状态 0：传统的“屏幕/旁观者”2D 视角 */}
+          <div className={`absolute inset-0 flex items-center justify-center transition-all duration-1000 ${step === 0 ? 'opacity-100 scale-100' : 'opacity-0 scale-50 pointer-events-none'}`}>
+             <div className="relative w-[80vw] md:w-[60vw] max-w-3xl aspect-video bg-slate-900 border-4 border-slate-700 rounded-lg shadow-[0_0_50px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden group">
+                <div className="h-6 bg-slate-800 border-b border-slate-700 flex items-center px-3 gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                </div>
+                <div className="flex-1 relative flex items-center justify-center bg-[radial-gradient(circle_at_center,_#0f172a,_#000000)]">
+                   <Globe className="w-24 h-24 text-cyan-500/50 animate-spin-slow" />
+                   <div className="absolute bottom-8 text-center w-full">
+                     <p className="text-slate-400 font-mono text-sm mb-4">Display Mode: Flat Screen 2D</p>
+                     <button onClick={() => setStep(1)} className="bg-cyan-600/20 border border-cyan-500 text-cyan-400 px-6 py-2 rounded-full hover:bg-cyan-500 hover:text-black transition-all font-bold tracking-widest text-sm flex items-center justify-center gap-2 mx-auto shadow-[0_0_15px_rgba(34,211,238,0.2)]">
+                        <Headset className="w-4 h-4" /> 激活 VR 赋形
+                     </button>
+                   </div>
+                </div>
+             </div>
+          </div>
+
+          {/* 状态 1：裸眼 3D VR 沉浸视角 */}
+          <div className={`absolute inset-0 overflow-hidden transition-all duration-[2000ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${step === 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-[2.5] blur-xl pointer-events-none'}`}>
+            
+            {/* === 核心 3D 视差场景层 (Scene) === */}
+            <div 
+              ref={sceneRef} 
+              className="absolute inset-0 w-[200vw] h-[200vh] -left-[50vw] -top-[50vh]" 
+              style={{ transformStyle: 'preserve-3d' }}
+            >
+              {/* 极远景：深邃星空 (Z轴深度推至远方) */}
+              <div className="absolute inset-0" style={{ transform: 'translateZ(-800px) scale(2.5)' }}>
+                <Starfield density={200} dark={true} transparentBackground={true} />
+              </div>
+
+              {/* 中景：遮天蔽日的超巨大异象结构 */}
+              <div className="absolute top-1/2 left-1/2 z-20 flex justify-center" style={{ transform: 'translate(-50%, -50%) translateZ(100px)' }}>
+                 <div className="relative w-[600px] h-[600px] md:w-[1500px] md:h-[1500px] bg-[#010204]/95 rounded-full border border-cyan-500/20 shadow-[0_0_200px_rgba(34,211,238,0.15),inset_0_0_400px_rgba(168,85,247,0.2)] flex items-center justify-center animate-float backdrop-blur-md" style={{ transformStyle: 'preserve-3d' }}>
+                    {/* 立体三维星环 (X/Y/Z轴混合旋转) */}
+                    <div className="absolute w-[120%] h-[120%] border-t-4 border-b border-cyan-500/20 rounded-full animate-[spin_40s_linear_infinite]" style={{ transform: 'rotateX(75deg) rotateY(20deg)' }}></div>
+                    <div className="absolute w-[110%] h-[110%] border-l-4 border-r border-purple-500/20 rounded-full animate-[spin_50s_linear_infinite_reverse]" style={{ transform: 'rotateX(65deg) rotateZ(45deg)' }}></div>
+                    <div className="w-[80%] h-[80%] border border-cyan-400/10 rounded-full flex items-center justify-center animate-[spin_60s_linear_infinite]">
+                      <div className="w-[50%] h-[50%] border-t-2 border-purple-500/30 rounded-full animate-[spin_30s_linear_infinite_reverse]"></div>
+                    </div>
+                    {/* 刺目的高亮核心 */}
+                    <div className="absolute w-[15%] h-[15%] bg-white rounded-full shadow-[0_0_150px_#22d3ee,0_0_300px_rgba(255,255,255,0.8)] animate-pulse"></div>
+                 </div>
+              </div>
+              
+              {/* 近景景深：悬浮于眼前的失焦光斑 */}
+              <div className="absolute top-[30%] left-[20%]" style={{ transform: 'translateZ(400px)' }}>
+                <div className="w-12 h-12 bg-cyan-500/40 blur-[5px] rounded-sm animate-[spin_8s_linear_infinite]"></div>
+              </div>
+              <div className="absolute bottom-[35%] right-[25%]" style={{ transform: 'translateZ(550px)' }}>
+                <div className="w-24 h-24 border-4 border-purple-500/30 blur-[8px] rounded-full animate-float"></div>
+              </div>
+            </div>
+
+            {/* 中心暗黑遮罩加强空间纵深感 */}
+            <div className="absolute inset-0 pointer-events-none z-30 bg-[radial-gradient(circle_at_center,_transparent_30%,_rgba(0,0,0,0.85)_100%)]"></div>
+            
+            {/* === 2D HUD 头显模拟层 (反向视差平移) === */}
+            <div ref={hudRef} className="absolute inset-0 pointer-events-none z-40 flex items-center justify-center">
+              
+              {/* 沉浸式球形暗角 (Vignette) */}
+              <div className="absolute w-[150vw] h-[150vh] border-[10vw] border-black rounded-[50%] shadow-[inset_0_0_200px_rgba(0,0,0,1)] mix-blend-multiply opacity-90"></div>
+              {/* 屏幕扫描线 */}
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(34,211,238,0.03)_1px,transparent_1px)] bg-[size:100%_8px]"></div>
+
+              {/* 动态准星 */}
+              <div className="absolute w-24 h-24 border-2 border-cyan-400/40 rounded-full flex items-center justify-center opacity-70">
+                <div className="w-2 h-2 bg-cyan-300 rounded-full shadow-[0_0_20px_cyan]"></div>
+                <div className="absolute top-0 w-full h-1 bg-cyan-400/40"></div>
+                <div className="absolute bottom-0 w-full h-1 bg-cyan-400/40"></div>
+                <div className="absolute left-0 w-1 h-full bg-cyan-400/40"></div>
+                <div className="absolute right-0 w-1 h-full bg-cyan-400/40"></div>
+              </div>
+
+              {/* 左上角系统数据 (附带极其科幻的红蓝伪色差) */}
+              <div 
+                className="absolute top-[15vh] left-[10vw] flex flex-col gap-2 font-mono text-cyan-400/90 text-xs md:text-sm animate-fadeIn tracking-widest"
+                style={{ textShadow: '4px 0 0 rgba(255,0,0,0.6), -4px 0 0 rgba(0,255,255,0.6)' }}
+              >
+                <span className="flex items-center gap-2"><Activity className="w-4 h-4 animate-pulse" /> NEURAL-LINK: ACTIVE</span>
+                <span>FOV: 150° (ULTRA-WIDE PANORAMA)</span>
+                <span>SENSE OF SCALE: COLOSSAL</span>
+                <span>TARGET: UNKNOWN ENTITY</span>
+              </div>
+              
+              {/* 右下角标志 */}
+              <div className="absolute bottom-[15vh] right-[10vw] flex gap-4 font-mono text-cyan-400/60"
+                   style={{ textShadow: '4px 0 0 rgba(255,0,0,0.4), -4px 0 0 rgba(0,255,255,0.4)' }}>
+                <Database className="w-14 h-14 animate-pulse text-cyan-400" />
+              </div>
+            </div>
+
+            {/* === 交互 UI 容器层 (位于底部中心，微弱阻尼晃动) === */}
+            <div className="absolute z-50 w-full bottom-[10%] md:bottom-[12%] flex justify-center px-4 pointer-events-none">
+               <div ref={uiRef} className={`bg-black/60 border border-cyan-900/50 backdrop-blur-md p-6 md:p-10 rounded-2xl w-full max-w-3xl shadow-[0_0_80px_rgba(0,0,0,0.9),inset_0_0_30px_rgba(34,211,238,0.15)] animate-fadeIn ${step === 1 ? 'pointer-events-auto' : 'pointer-events-none'}`} style={{ animationDelay: '1s', animationFillMode: 'both' }}>
+                 <p className="text-cyan-400 font-mono tracking-[0.3em] text-xs md:text-sm mb-4 uppercase flex justify-center items-center gap-2">
+                   <span className="w-2 h-2 bg-cyan-400 animate-ping rounded-full shadow-[0_0_10px_cyan]"></span> 沉浸协议已激活
+                 </p>
+                 
+                 {/* 带光学色差效果的粗体主标题 */}
+                 <h2 className="text-2xl md:text-4xl text-white font-bold tracking-widest mb-6 drop-shadow-[0_0_10px_rgba(255,255,255,0.4)] text-center"
+                     style={{ textShadow: '3px 0px 0px rgba(255,0,0,0.5), -3px 0px 0px rgba(0,255,255,0.5)' }}>
+                   从旁观者，到亲历者。
+                 </h2>
+                 
+                 <p className="text-slate-300 text-sm md:text-lg leading-relaxed font-light text-left border-l-4 border-cyan-500 pl-4 md:pl-6 bg-gradient-to-r from-cyan-950/40 to-transparent py-3">
+                   PCG 算法给了这个宇宙无穷无尽的<span className="text-cyan-300 font-bold px-1 drop-shadow-md">广度</span>。<br/>
+                   但当 3D 视差与巨物尺度感扑面而来时，<br/>
+                   VR 才真正赋予了这个数字空间令人敬畏的<span className="text-purple-400 font-bold px-1 text-xl drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]">真实感与深度</span>。
+                 </p>
+                 
+                 <button onClick={onNext} className="mt-8 group relative px-8 py-4 bg-cyan-900/50 border border-cyan-400 text-cyan-300 rounded-full hover:bg-cyan-400 hover:text-black hover:shadow-[0_0_40px_rgba(34,211,238,0.8)] transition-all flex items-center justify-center gap-3 font-bold tracking-[0.2em] w-full max-w-sm mx-auto overflow-hidden">
+                    <div className="absolute inset-0 w-0 bg-white/20 group-hover:w-full transition-all duration-500 ease-out"></div>
+                    <Sparkles className="w-5 h-5 group-hover:animate-pulse relative z-10" />
+                    <span className="relative z-10">启动跃迁：进入终局</span>
+                 </button>
+               </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // --- 终焉章节：多重宇宙的回声与羁绊 ---
+    const OutroSection = () => {
+      const [step, setStep] = useState(0);
+      const [showSummary, setShowSummary] = useState(false);
+
+      // --- 多重宇宙的回声 (Message Modules) 数据 ---
+      const echoes = [
+        { text: "我在这里看了一整天的日落。", user: "Traveler_CN", top: "15%", left: "10%", delay: "6s", floatDelay: "0s" },
+        { text: "宇宙很大，祝你好运。", user: "Echo-404", top: "25%", left: "75%", delay: "8s", floatDelay: "1s" },
+        { text: "不要碰那些发光的蛋！！", user: "Newbie_99", top: "45%", left: "85%", delay: "9s", floatDelay: "0.5s" },
+        { text: "终于建好了第一个家。虽然很简陋。", user: "BuilderX", top: "60%", left: "8%", delay: "11s", floatDelay: "2s" },
+        { text: "有人在这个星系吗？", user: "Lost_Soul", top: "75%", left: "75%", delay: "13s", floatDelay: "1.5s" },
+        { text: "再见，我将前往中心。", user: "Atlas_Seeker", top: "35%", left: "20%", delay: "15s", floatDelay: "0.8s" }
+      ];
+
+      return (
+        <div className="fixed inset-0 z-50 bg-[#02040a] text-slate-300 font-sans flex flex-col items-center justify-center overflow-hidden">
+          
+          <NebulaBackground />
+          
+          <div className={`absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(88,28,135,0.2)_0%,_transparent_100%)] pointer-events-none transition-opacity duration-2000 ${step >= 2 ? 'opacity-100' : 'opacity-0'}`}></div>
+
+          {/* 渲染多重宇宙的回声通信胶囊 (在 step 3 时触发) */}
+          {step === 3 && !showSummary && echoes.map((echo, i) => (
+             <div key={i} className="absolute z-20 animate-echo flex flex-col gap-1 max-w-[220px] pointer-events-none" style={{ top: echo.top, left: echo.left, animationDelay: echo.delay }}>
+               <div className="animate-float" style={{ animationDelay: echo.floatDelay }}>
+                 <div className="bg-slate-900/60 border border-cyan-500/30 backdrop-blur-sm px-4 py-3 rounded-lg text-xs md:text-sm text-cyan-50 shadow-[0_0_20px_rgba(34,211,238,0.1)] relative">
+                   <div className="absolute -bottom-1.5 left-4 w-3 h-3 bg-slate-900/60 border-b border-r border-cyan-500/30 transform rotate-45"></div>
+                   "{echo.text}"
+                 </div>
+                 <span className="text-[10px] font-mono text-cyan-500/60 ml-2 mt-2 block flex items-center gap-1">
+                   <MessageSquare className="w-3 h-3" /> {echo.user}
+                 </span>
+               </div>
+             </div>
+          ))}
+
+          {/* === 新增：隐藏的 Q&A 核心总结面板 === */}
+          <div className={`absolute inset-0 z-50 flex items-center justify-center transition-all duration-700 backdrop-blur-md bg-black/60 ${showSummary ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+             <div className={`w-full max-w-4xl bg-slate-900/80 border border-cyan-500/50 rounded-2xl p-8 md:p-12 shadow-[0_0_80px_rgba(34,211,238,0.2)] transition-all duration-700 transform ${showSummary ? 'scale-100 translate-y-0' : 'scale-90 translate-y-10'}`}>
+                <div className="flex justify-between items-center mb-8 border-b border-slate-700 pb-4">
+                   <div className="flex items-center gap-3 text-cyan-400 font-mono tracking-widest">
+                     <Database className="w-5 h-5 animate-pulse" />
+                     <span>EXECUTIVE SUMMARY // 核心理论总结</span>
+                   </div>
+                   <button onClick={() => setShowSummary(false)} className="text-slate-500 hover:text-white transition-colors">
+                     [ 关闭 / CLOSE ]
+                   </button>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                   {/* 总结 1: PCG */}
+                   <div className="bg-slate-950/50 border border-slate-700 p-6 rounded-xl hover:border-cyan-400 transition-colors group">
+                     <Binary className="w-8 h-8 text-cyan-500 mb-4 group-hover:animate-pulse" />
+                     <h3 className="text-xl text-white font-bold mb-2 tracking-widest">算法造物 <span className="text-sm font-normal text-cyan-500 font-mono block mt-1">PCG Generation</span></h3>
+                     <ul className="text-sm text-slate-400 space-y-2 mt-4 list-disc pl-4 marker:text-cyan-800">
+                       <li>用<span className="text-cyan-300">纯数学公式</span>替代海量人工资产。</li>
+                       <li>解决独立游戏团队的<span className="text-white">产能边界</span>问题。</li>
+                       <li>创造了具有无穷尺度的底座。</li>
+                     </ul>
+                   </div>
+
+                   {/* 总结 2: VR */}
+                   <div className="bg-slate-950/50 border border-slate-700 p-6 rounded-xl hover:border-blue-400 transition-colors group">
+                     <Headset className="w-8 h-8 text-blue-500 mb-4 group-hover:animate-pulse" />
+                     <h3 className="text-xl text-white font-bold mb-2 tracking-widest">VR 赋形 <span className="text-sm font-normal text-blue-500 font-mono block mt-1">Spatial Immersion</span></h3>
+                     <ul className="text-sm text-slate-400 space-y-2 mt-4 list-disc pl-4 marker:text-blue-800">
+                       <li>打破屏幕第四面墙，提供<span className="text-blue-300">1:1真实尺度感</span>。</li>
+                       <li>解决数字空间的<span className="text-white">深空压迫感与真实度</span>。</li>
+                       <li>将“旁观者”彻底转化为“亲历者”。</li>
+                     </ul>
+                   </div>
+
+                   {/* 总结 3: AI */}
+                   <div className="bg-slate-950/50 border border-slate-700 p-6 rounded-xl hover:border-purple-400 transition-colors group">
+                     <Sparkles className="w-8 h-8 text-purple-500 mb-4 group-hover:animate-pulse" />
+                     <h3 className="text-xl text-white font-bold mb-2 tracking-widest">AI 铸魂 <span className="text-sm font-normal text-purple-500 font-mono block mt-1">Dynamic Soul</span></h3>
+                     <ul className="text-sm text-slate-400 space-y-2 mt-4 list-disc pl-4 marker:text-purple-800">
+                       <li>用实时生成技术带来<span className="text-purple-300">动态反馈与剧情</span>。</li>
+                       <li>化解宇宙探险中绝对的<span className="text-white">单机孤独感</span>。</li>
+                       <li>赋予数字宇宙真实的“生命与羁绊”。</li>
+                     </ul>
+                   </div>
+                </div>
+
+                <div className="mt-8 text-center text-slate-500 text-xs font-mono tracking-widest">
+                  /// END OF REPORT ///
+                </div>
+             </div>
+          </div>
+
+          <div className={`relative w-full max-w-5xl p-6 flex flex-col items-center h-full justify-center text-center transition-all duration-1000 ${showSummary ? 'filter blur-md opacity-20 scale-95 z-0' : 'z-30'}`}>
+            
+            {/* Step 0: 童年梦想与绝对独立的孤独 */}
+            {step === 0 && (
+              <div key="step-0" className="animate-fadeIn flex flex-col items-center w-full">
+                
+                <div className="relative w-full h-56 md:h-80 flex flex-col items-center justify-end mb-12 overflow-hidden pointer-events-none">
+                  <div className="absolute top-10 md:top-20 w-[300px] h-[300px] md:w-[600px] md:h-[600px] rounded-full bg-[#02040a] border-t border-cyan-500/40 shadow-[0_-30px_80px_rgba(34,211,238,0.15),inset_0_50px_100px_rgba(0,0,0,1)] z-0 animate-float-delayed flex justify-center">
+                    <div className="w-full h-1/3 bg-gradient-to-b from-purple-500/10 to-transparent rounded-t-full"></div>
+                  </div>
+                  
+                  <div className="absolute bottom-8 md:bottom-12 w-[150%] h-[1px] bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent z-10 shadow-[0_0_20px_rgba(34,211,238,0.9)]"></div>
+                  <div className="absolute bottom-0 w-full h-16 md:h-24 bg-gradient-to-t from-[#02040a] to-cyan-900/30 blur-xl z-0"></div>
+
+                  <div className="relative z-20 flex flex-col items-center mb-8 md:mb-12 animate-fadeIn" style={{ animationDelay: '0.8s' }}>
+                    <User className="w-4 h-4 md:w-5 md:h-5 text-slate-700 fill-[#02040a] stroke-slate-500 drop-shadow-[0_-2px_5px_rgba(255,255,255,0.6)]" />
+                    <div className="w-8 h-1 bg-cyan-500/40 rounded-full blur-[2px] mt-1"></div>
+                  </div>
+                </div>
+
+                <div className="text-xl md:text-3xl text-slate-300 font-light tracking-[0.2em] leading-relaxed mb-12 max-w-4xl space-y-6 text-left relative z-30">
+                  <p>也许很多人小时候都曾在日记里写过：<span className="text-white font-medium">“我想当一名太空人。”</span></p>
+                  <p className="text-slate-400 text-lg md:text-2xl">后来我们长大了，发现<span className="text-red-400 font-medium">现实的引力太重</span>，没能飞上太空。<br/>但游戏，给了我们第二次仰望星空、体验另一种人生的机会。</p>
+                  <p className="text-purple-300 font-medium border-l-4 border-purple-500 pl-6 bg-purple-950/20 py-4 mt-4 shadow-[inset_10px_0_20px_rgba(168,85,247,0.1)] backdrop-blur-sm relative overflow-hidden group">
+                    <span className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-transparent transform -translate-x-full group-hover:translate-x-0 transition-transform duration-1000"></span>
+                    当你一个人驾驶飞船航行在几十万光年的深空中，<br/>
+                    那种星际探索的<span className="text-white font-bold drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]">孤独感</span>，极其直观地触及了人类的本质——<br/>
+                    <span className="text-cyan-300 text-2xl md:text-4xl font-black tracking-widest block mt-4 drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]">我们生命的绝对独立性</span>。
+                  </p>
+                </div>
+                <button onClick={() => setStep(1)} className="group relative px-8 py-4 bg-slate-900 border border-slate-600 text-slate-300 rounded-full hover:border-cyan-400 hover:text-cyan-300 transition-all flex items-center gap-3 backdrop-blur-md z-30">
+                  <Search className="w-5 h-5 group-hover:animate-pulse" />
+                  <span className="font-mono tracking-widest uppercase">探寻：星与人</span>
+                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </div>
+            )}
+
+            {/* Step 1: 星星与人的隐喻 */}
+            {step === 1 && (
+              <div key="step-1" className="animate-fadeIn flex flex-col items-center w-full">
+                <div className="relative w-full max-w-2xl h-48 mb-12 border-b border-slate-800/50 flex items-center justify-center overflow-hidden">
+                  <div className="absolute w-32 h-32 rounded-full bg-[radial-gradient(circle_at_30%_30%,_#3b82f6,_#020617)] shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.8)] z-10"></div>
+                  <div className="absolute z-20 animate-ship-approach">
+                    <Rocket className="w-8 h-8 text-white filter drop-shadow-[0_0_10px_rgba(255,255,255,0.8)] transform rotate-45" />
+                  </div>
+                  <div className="absolute inset-0 bg-blue-500/10 opacity-0 animate-[pulse_1s_ease-in-out_4s_1] pointer-events-none"></div>
+                </div>
+
+                <div className="text-lg md:text-2xl leading-relaxed text-slate-200 font-light max-w-4xl space-y-6 text-left">
+                  <p>在这个浩瀚的代码宇宙里，<span className="text-cyan-300 font-medium text-2xl md:text-3xl drop-shadow-md">一颗星，其实就像一个人</span>。</p>
+                  <p className="text-slate-400">
+                    生命中过往形形色色的人，就像我们在超空间跃迁时突然降落的某颗未知星球。<br/>
+                    我们去探索、去感受、去见证它的风暴与宁静。<br/>
+                    但最终，我们还是会不可避免地回到飞船，启动曲速引擎——
+                  </p>
+                  <p className="text-blue-300 italic tracking-widest bg-blue-950/30 p-4 rounded-lg border border-blue-900/50 backdrop-blur-sm shadow-[0_0_20px_rgba(59,130,246,0.1)]">
+                    “也许明天就会离开，也许从此以后，我们再也不会相遇了。”
+                  </p>
+                  <p className="text-center text-white font-bold mt-10 pt-8 border-t border-slate-800/80">
+                    既然注定要离开，既然宇宙和生命的底色就是孤独，<br/>
+                    <span className="text-purple-400 block mt-2 text-xl md:text-3xl drop-shadow-[0_0_10px_rgba(168,85,247,0.3)]">那么，这些短暂相遇的意义究竟是什么？</span>
+                  </p>
+                </div>
+                
+                <button onClick={() => setStep(2)} className="mt-16 group relative flex flex-col items-center gap-3 transition-all z-30">
+                  <span className="text-slate-500 text-xs font-mono tracking-[0.3em] uppercase group-hover:text-purple-400 transition-colors duration-500">Initiate Soul Sequence</span>
+                  <div className="flex items-center gap-4 px-8 py-3 bg-transparent border border-slate-700 rounded-full hover:border-purple-400 hover:bg-purple-950/30 transition-all duration-500 backdrop-blur-sm shadow-[0_0_15px_rgba(0,0,0,0.5)] group-hover:shadow-[0_0_25px_rgba(168,85,247,0.3)]">
+                    <RadioSignal className="w-5 h-5 text-slate-400 group-hover:text-purple-300 group-hover:animate-pulse transition-colors" />
+                    <span className="font-light tracking-[0.3em] text-slate-300 group-hover:text-white transition-colors text-sm md:text-base">赋予相遇真正的意义</span>
+                    <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-purple-300 group-hover:translate-x-1 transition-all" />
+                  </div>
+                </button>
+              </div>
+            )}
+
+            {/* Step 2: 终极解法与 AI 的意义 */}
+            {step === 2 && (
+              <div key="step-2" className="animate-fadeIn flex flex-col items-center w-full justify-center">
+                <Sparkles className="w-12 h-12 text-cyan-400 mb-6 animate-spin-slow drop-shadow-[0_0_15px_rgba(34,211,238,0.8)]" />
+                
+                <div className="mb-12 relative w-full flex justify-center">
+                  <h1 className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-200 to-white tracking-widest mb-4 animate-text-glow text-center leading-tight whitespace-nowrap">
+                    算法造物，VR赋形，AI铸魂
+                  </h1>
+                  <div className="absolute -inset-4 bg-cyan-500/20 blur-3xl -z-10 rounded-full"></div>
+                </div>
+
+                <div className="text-base md:text-xl leading-relaxed text-slate-200 font-light max-w-4xl space-y-6 bg-slate-900/40 p-8 border border-purple-500/30 rounded-2xl backdrop-blur-md text-left shadow-[0_0_40px_rgba(0,0,0,0.5)]">
+                  <p>
+                    我们引入 AI 技术，并不是为了去强行塞满宇宙，去抹除那种属于人类宿命的孤独。
+                  </p>
+                  <p className="text-slate-400">
+                    我们只是希望，在那些偶然降落、短暂相遇的瞬间里，<br/>
+                    AI 能通过实时的交互、动态的剧情和聪明的反馈，带来哪怕一点点<span className="text-white font-medium drop-shadow-[0_0_5px_rgba(255,255,255,0.5)]">真实的羁绊与回应</span>。
+                  </p>
+                  <div className="bg-gradient-to-r from-purple-900/40 to-transparent border-l-4 border-purple-400 p-6 mt-4">
+                    <span className="text-purple-200 font-bold text-lg md:text-2xl tracking-wide block leading-relaxed">
+                      让那场注定要告别的相遇，变得更加刻骨铭心；<br/>
+                      让<span className="text-cyan-300 mx-2 drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]">『 体验 』</span>本身，成为相遇最大的意义。
+                    </span>
+                  </div>
+                </div>
+
+                <button onClick={() => setStep(3)} className="mt-12 group relative px-8 py-4 bg-transparent border-2 border-cyan-400 text-cyan-400 rounded-full hover:bg-cyan-400 hover:text-black hover:shadow-[0_0_20px_rgba(34,211,238,0.6)] transition-all flex items-center gap-3 font-bold tracking-[0.2em] uppercase backdrop-blur-sm">
+                  <CloudLightning className="w-5 h-5 group-hover:animate-pulse" />
+                  点燃星海灵魂
+                </button>
+              </div>
+            )}
+
+            {/* Step 3: 结尾寄语与多重宇宙回声 */}
+            {step === 3 && (
+              <div key="step-3" className="flex flex-col items-center w-full justify-center min-h-[60vh] relative z-30">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(34,211,238,0.05)_0%,_transparent_60%)] animate-pulse pointer-events-none"></div>
+                <Globe className="w-16 h-16 text-cyan-500/40 mb-8 animate-float drop-shadow-[0_0_30px_rgba(34,211,238,0.5)]" />
+
+                <div className="text-xl md:text-3xl text-white font-light tracking-[0.2em] leading-relaxed max-w-4xl text-center space-y-10 drop-shadow-md">
+                  <p className="animate-fadeIn" style={{ animationDelay: '0.2s', animationFillMode: 'both' }}>
+                    《无人深空》用八年的时间，为我们搭建好了一个无边无际的游乐场。
+                  </p>
+                  <p className="text-slate-300 text-lg md:text-2xl animate-fadeIn" style={{ animationDelay: '1.5s', animationFillMode: 'both' }}>
+                    但它现在还在等待，等待着被真正唤醒。<br/>
+                    <span className="text-white mt-4 block font-medium drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">我们不仅要用代码构建世界，更要用技术去点燃这个宇宙的灵魂。</span>
+                  </p>
+                  <div className="relative py-8 animate-fadeIn" style={{ animationDelay: '3s', animationFillMode: 'both' }}>
+                     <div className="absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
+                     <p className="text-cyan-300 font-medium italic drop-shadow-[0_0_15px_rgba(34,211,238,0.5)] animate-text-glow text-2xl md:text-4xl leading-relaxed">
+                       “愿我们都能在这广袤孤独的代码宇宙中，<br/>用我们的体验，去赋予每一颗星、每一次相遇独特的意义。”
+                     </p>
+                     <div className="absolute inset-x-10 bottom-0 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent"></div>
+                  </div>
+                </div>
+
+                <div className="mt-20 flex flex-col items-center animate-fadeIn" style={{ animationDelay: '5s', animationFillMode: 'both' }}>
+                  <p className="text-purple-400 font-mono tracking-[0.4em] text-sm uppercase flex items-center gap-2 drop-shadow-sm mb-6">
+                    <Sparkles className="w-4 h-4 animate-pulse" /> Presentation Complete <Sparkles className="w-4 h-4 animate-pulse" />
+                  </p>
+                  
+                  {/* 新增的动作按钮区：包含了重启与日志总结 */}
+                  <div className="flex flex-col sm:flex-row items-center gap-6 mt-4">
+                    <button onClick={() => window.location.reload()} className="group flex items-center gap-3 text-slate-400 hover:text-cyan-400 transition-all duration-300 pointer-events-auto bg-slate-900/60 px-6 py-3 rounded-full border border-slate-700/80 hover:border-cyan-500 backdrop-blur-md shadow-lg">
+                      <RefreshCw className="w-4 h-4 group-hover:-rotate-180 transition-transform duration-700" />
+                      <span className="text-xs tracking-[0.3em] uppercase">重启宇宙循环</span>
+                    </button>
+
+                    <button onClick={() => setShowSummary(true)} className="group flex items-center gap-3 text-slate-400 hover:text-purple-400 transition-all duration-300 pointer-events-auto bg-slate-900/60 px-6 py-3 rounded-full border border-slate-700/80 hover:border-purple-500 backdrop-blur-md shadow-lg">
+                      <Database className="w-4 h-4 group-hover:animate-pulse" />
+                      <span className="text-xs tracking-[0.3em] uppercase">提取核心日志</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    // --- 根组件 (路由与全局跃迁控制) ---
+    function App() {
+      // 状态：intro (开场) -> chronicle (编年史) -> pcg (底层真理) -> vr -> outro (哲思结尾)
+      const [currentSection, setCurrentSection] = useState('intro'); 
+      const [warpState, setWarpState] = useState('idle'); // 'idle' | 'warping_in' | 'warping_out'
+
+      // 全局路由导航控制：附带曲速跃迁过场效果
+      const handleNavigate = (nextSection) => {
+        if (warpState !== 'idle') return;
+        
+        // 1. 启动跃迁拉扯特效
+        setWarpState('warping_in');
+        
+        // 2. 1.2秒后达到跃迁极速，在此黑屏瞬间切换组件
+        setTimeout(() => {
+          setCurrentSection(nextSection);
+          
+          // 3. 切换为减速飞出状态
+          setWarpState('warping_out');
+          
+          // 4. 0.8秒后完全淡出跃迁特效，恢复正常 UI
+          setTimeout(() => {
+            setWarpState('idle');
+          }, 800); 
+        }, 1200); 
+      };
+
+      // --- 全局快捷键：监听 F 键切换全屏 ---
+      useEffect(() => {
+        const handleKeyDown = (e) => {
+          if (e.target.tagName.toLowerCase() === 'input') return;
+          if (e.key === 'f' || e.key === 'F') {
+            e.preventDefault();
+            if (!document.fullscreenElement) {
+              document.documentElement.requestFullscreen().catch(err => {
+                console.log(`全屏模式请求失败: ${err.message}`);
+              });
+            } else {
+              if (document.exitFullscreen) {
+                document.exitFullscreen();
+              }
+            }
+          }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+      }, []);
+
+      return (
+        <React.Fragment>
+          {/* 全局曲速跃迁视觉层 (Z-index 最高) */}
+          <WarpOverlay warpState={warpState} />
+
+          {/* 各大核心板块，使用 handleNavigate 来替换原本的 setCurrentSection，实现无缝跃迁 */}
+          {currentSection === 'intro' && <IntroScreen onComplete={() => handleNavigate('chronicle')} />}
+          
+          {currentSection === 'chronicle' && <MainApp onEnterPCG={() => handleNavigate('pcg')} />}
+          
+          {currentSection === 'pcg' && <PCGSection onBack={() => handleNavigate('chronicle')} onNext={() => handleNavigate('vr')} />}
+          
+          {currentSection === 'vr' && <VRSection onNext={() => handleNavigate('outro')} />}
+          
+          {currentSection === 'outro' && <OutroSection />}
+        </React.Fragment>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
